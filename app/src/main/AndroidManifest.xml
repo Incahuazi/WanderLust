@@ -46,19 +46,6 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_fullscreen"
             android:theme="@style/FullscreenTheme" />
-        <activity
-            android:name=".personListActivity"
-            android:label="@string/title_person_list"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".personDetailActivity"
-            android:label="@string/title_person_detail"
-            android:parentActivityName=".personListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="be.ictera.wanderlust.personListActivity" />
-        </activity>
         <activity android:name=".ShowEncounterScreenSlidePagerActivity"></activity>
     </application>
 
