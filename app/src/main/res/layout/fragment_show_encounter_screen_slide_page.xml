@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <android.support.v4.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+    <TableLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="0dp"
+        android:paddingTop="0dp"
+        >
+        <TableRow android:layout_marginBottom="0dp">
+            <TextView
+                android:paddingStart="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:text="Name" />
+            <TextView
+                android:id="@+id/Name"
+                android:layout_width="0dp"
+                android:layout_marginTop="20dp"
+                android:layout_height="50dp"
+                android:layout_weight = "1"
+                android:text="Erik" />
+        </TableRow>
+        <TableRow android:layout_marginTop="0dp">
+            <TextView
+                android:paddingStart="5dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:text="Message" />
+            <TextView
+                android:id="@+id/Message"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight = "1"
+                android:text="Rhaaaaa!!!" />
+        </TableRow>
+        <TableRow
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="40dp">
+            <TextView
+                android:paddingStart="5dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:text="Location" />
+            <TextView
+                android:id="@+id/Location"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight = "1"
+                android:text="Pokhara" />
+        </TableRow>
+
+
+
+        <TableRow>
+            <ImageView
+                android:id="@+id/Pic1"
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="40px"
+                android:layout_gravity="center"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:id="@+id/Pic2"
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="40px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:id="@+id/Pic3"
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="80px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+
+        <TableRow>
+            <ImageView
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="80px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="80px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="80px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="80px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="80px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+        <TableRow>
+            <ImageView
+                android:layout_width="@android:dimen/notification_large_icon_width"
+                android:layout_height="@android:dimen/notification_large_icon_height"
+                android:layout_weight = "1"
+                android:layout_span="2"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:background="@drawable/image_border"
+                android:layout_marginBottom="80px"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
+        </TableRow>
+
+    </TableLayout>
+    </android.support.v4.widget.NestedScrollView>

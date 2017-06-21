@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">WanderLust</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_add_encounter">Add an Encounter</string>
+    <string name="AdddEncounterStep1">"Step 1 \n\n"</string>
+    <string name="AdddEncounterStep2">"Step 2 \n\n"</string>
+    <string name="AdddEncounterAddPics">"Add some nice pictures!"</string>
+    <string name="AdddEncounterAddInfoText">Add a message to the world</string>
+    <string name="large_text">
+        "                                                                                                                                                                       "
+    </string>
+
+    <string name="title_activity_display_picture">DisplayPictureActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="title_person_list">persons</string>
+    <string name="title_person_detail">person Detail</string>
+    <string name="lorem_ipsum">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus "</string>
+</resources>
