@@ -40,7 +40,7 @@ public class LanguageSelectActivity extends ListActivity {
         Intent intent = new Intent(this, ShowEncounterScreenSlidePagerActivity.class);
 
 
-        startActivity(intent);
+        startActivity(intent); 
 
 
     }
