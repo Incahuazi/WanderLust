@@ -1,8 +1,10 @@
 package be.ictera.wanderlust;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.AndroidCharacter;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -27,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+import Database.WanderLustDb;
+import Database.WanderLustDbHelper;
 import Entity.Encounter;
 import Entity.EncounterPicture;
 import ShowEncounters.ScreenSlidePageFragment;
@@ -47,6 +52,12 @@ public class AddEncounterActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Button buttonSave = (Button)findViewById(R.id.ButtonSaveEncounter);
+        buttonSave.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                onEncounterSave();
+            }});
+
         this.pics[0] = (ImageView)findViewById(R.id.Pic1);
         this.pics[1] = (ImageView)findViewById(R.id.Pic2);
         this.pics[2] = (ImageView)findViewById(R.id.Pic3);
@@ -62,6 +73,42 @@ public class AddEncounterActivity extends AppCompatActivity {
         }
 
         encounter = new Encounter();
+    }
+
+    private void onEncounterSave() {
+        WanderLustDbHelper dbhelper = new WanderLustDbHelper(this);
+        SQLiteDatabase db = dbhelper.getWritableDatabase();
+        ContentValues encounterValues = new ContentValues();
+
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_NAME, this.encounter.Name);
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION, "somelocation");
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE, this.encounter.Message);
+
+        db.beginTransaction();
+        try {
+            long newEncounterId = db.insert(WanderLustDb.EncounterTable.TABLE_NAME, null, encounterValues);
+            for (EncounterPicture encounterPicture: this.encounter.encounterPicture
+                 ) {
+                if (encounterPicture != null && encounterPicture.imageFilePath !=""){
+                    //picture exists
+                    ContentValues encounterPictureValues = new ContentValues();
+                    encounterPictureValues.put(WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID, newEncounterId);
+                    encounterPictureValues.put(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH, encounterPicture.imageFilePath);
+                    encounterPictureValues.put(WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED, 0);
+
+                    db.insert(WanderLustDb.EncounterPictureTable.TABLE_NAME, null, encounterPictureValues);
+                }
+            }
+            db.setTransactionSuccessful();
+        }
+        catch (Exception e){
+            Toast toast = Toast.makeText(this,"Error saving to db - " + e.getMessage(), Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        finally{
+            db.endTransaction();
+        }
+        this.finish();
     }
 
     protected void onClickListener(int item){

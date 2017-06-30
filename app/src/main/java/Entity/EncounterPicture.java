@@ -11,6 +11,7 @@ import java.io.File;
 public class EncounterPicture {
     public String imageFilePath = "";
     public boolean synced = false;
+    public boolean censored = false;
 }
 
 

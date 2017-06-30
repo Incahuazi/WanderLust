@@ -1,6 +1,8 @@
 package be.ictera.wanderlust;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
@@ -14,6 +16,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import Database.WanderLustDb;
+import Database.WanderLustDbHelper;
 import Entity.Encounter;
 import Entity.EncounterPicture;
 import ShowEncounters.ScreenSlidePageFragment;
@@ -42,6 +49,8 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen_slide);
+
+        readEncounters();
 
         //add some encounter data
         encounters = new Encounter[5];
@@ -97,6 +106,67 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+    }
+
+    private void readEncounters(){
+        Map result = new HashMap<Integer, Encounter>();
+        WanderLustDbHelper dbHelper = new WanderLustDbHelper(this);
+
+        try {
+            SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+            String allEncountersAndPicsQuery = "SELECT " +
+                    "ET." + WanderLustDb.EncounterTable._ID + " AS ETID, " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_NAME + ", " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE + ", " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION + ", " +
+                    "EPT." +WanderLustDb.EncounterPictureTable._ID + " AS EPID, " +
+                    WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH + ", " +
+                    WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED +
+                    " FROM " + WanderLustDb.EncounterTable.TABLE_NAME + " ET" +
+                    " LEFT JOIN " + WanderLustDb.EncounterPictureTable.TABLE_NAME + " EPT" +
+                    " ON ET." + WanderLustDb.EncounterTable._ID + " = EPT." + WanderLustDb.EncounterPictureTable._ID +
+                    " ORDER BY ETID ASC";
+            Cursor cursor = db.rawQuery(allEncountersAndPicsQuery, null);
+
+            int previousEncounterId = -1;
+            int encounterCounter = 0;
+            int encounterPictureCounter = 0;
+            while(cursor.moveToNext()) {
+                int currentEncounterId = cursor.getInt(cursor.getColumnIndex("ETID"));
+                if (currentEncounterId==previousEncounterId){
+                    //Same encounter, add picture
+                    encounterPictureCounter++;
+                    Encounter encounter = (Encounter)result.get(encounterCounter);
+                    EncounterPicture encounterPicture = new EncounterPicture();
+                    encounterPicture.imageFilePath = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH));
+                    encounterPicture.synced = (cursor.getInt(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED))==1);
+
+                    encounter.encounterPicture[encounterPictureCounter] = encounterPicture;
+                }
+                else{
+                    //next encounter, add new encounter
+                    encounterCounter++;
+                    encounterPictureCounter = 0;
+                    Encounter encounter = new Encounter();
+                    encounter.Name = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_NAME));
+                    encounter.Message = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE));
+                    encounter.Location = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION));
+
+                    EncounterPicture encounterPicture = new EncounterPicture();
+                    encounterPicture.imageFilePath =  cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH));
+                    encounterPicture.synced = (cursor.getInt(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED))==1);
+
+                    encounter.encounterPicture[encounterPictureCounter] = encounterPicture;
+
+                    result.put(encounterCounter, encounter);
+                }
+                previousEncounterId = currentEncounterId;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

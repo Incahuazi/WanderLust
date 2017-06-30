@@ -37,10 +37,12 @@ public class LanguageSelectActivity extends ListActivity {
         LanguageItem foo = this.adapter.getItem(position);
 //        Intent intent = new Intent(this, AddEncounterActivity.class);
 //        Intent intent = new Intent(this, personListActivity.class);
-        Intent intent = new Intent(this, ShowEncounterScreenSlidePagerActivity.class);
 
+//        Intent intent = new Intent(this, ShowEncounterScreenSlidePagerActivity.class);
 
-        startActivity(intent); 
+        Intent intent = new Intent(this,HomeScreenActivity.class);
+
+        startActivity(intent);
 
 
     }
