@@ -20,6 +20,7 @@ public final class WanderLustDb {
         public static final String COLUMN_NAME_NAME = "Name";
         public static final String COLUMN_NAME_MESSAGE = "Message";
         public static final String COLUMN_NAME_LOCATION = "Location";
+        public static final String COLUMN_NAME_LOCATION_LATLONG = "LocationLatLong";
     }
 
     public static class EncounterPictureTable implements  BaseColumns{
@@ -35,6 +36,7 @@ public final class WanderLustDb {
                     EncounterTable._ID + " INTEGER PRIMARY KEY," +
                     EncounterTable.COLUMN_NAME_NAME + " TEXT," +
                     EncounterTable.COLUMN_NAME_LOCATION + " TEXT," +
+                    EncounterTable.COLUMN_NAME_LOCATION_LATLONG + " TEXT," +
                     EncounterTable.COLUMN_NAME_MESSAGE + " TEXT)"
             ;
 

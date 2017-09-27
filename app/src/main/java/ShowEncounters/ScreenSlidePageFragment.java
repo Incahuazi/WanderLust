@@ -2,6 +2,7 @@ package ShowEncounters;
 
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -12,7 +13,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import org.w3c.dom.Text;
+
+import java.io.File;
 
 import be.ictera.wanderlust.R;
 
@@ -35,18 +40,28 @@ public class ScreenSlidePageFragment extends Fragment {
                 R.layout.fragment_show_encounter_screen_slide_page, container, false);
 
         pics[0].imageView = (ImageView) rootView.findViewById(R.id.Pic1);
-        pics[0].imageView.setImageResource(R.drawable.nederlands);
-        pics[0].imagePath = this.getArguments().getString("Image1");
-
         pics[1].imageView = (ImageView) rootView.findViewById(R.id.Pic2);
-        pics[1].imageView.setImageResource(android.R.drawable.ic_menu_camera);
-        pics[1].imagePath = this.getArguments().getString("Image2");
-
         pics[2].imageView = (ImageView) rootView.findViewById(R.id.Pic3);
-        pics[2].imageView.setImageResource(android.R.drawable.ic_menu_camera);
-        pics[2].imagePath = this.getArguments().getString("Image3");
 
-        for (int i = 0; i <3 ; i++) {
+        for (int i = 0; i <= 2; i++) {
+            String temp = "Image" + (i+1);
+            pics[i].imagePath = this.getArguments().getString(temp);
+            if (pics[i].imagePath !="")
+            {
+                File picture = new File(pics[i].imagePath);
+                Glide.with(this).load(picture).into(pics[i].imageView);
+            }
+            else
+            {
+                pics[i].imageView.setImageResource(android.R.drawable.ic_menu_camera);
+                pics[i].imageView.setRotation(0);
+
+                Resources r = getResources();
+                pics[i].imageView.getLayoutParams().height = r.getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
+            }
+        }
+
+        for (int i = 0; i <=2 ; i++) {
             final int item = i;
             pics[i].imageView.setOnClickListener(new View.OnClickListener() {
                 @Override

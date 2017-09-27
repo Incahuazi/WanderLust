@@ -3,6 +3,8 @@
     package="be.ictera.wanderlust">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -41,13 +43,9 @@
         </provider>
 
         <activity android:name=".DisplayPictureActivity" />
-        <activity
-            android:name=".FullscreenActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_fullscreen"
-            android:theme="@style/FullscreenTheme" />
         <activity android:name=".ShowEncounterScreenSlidePagerActivity" />
-        <activity android:name=".HomeScreenActivity"></activity>
+        <activity android:name=".HomeScreenActivity" />
+
     </application>
 
 </manifest>

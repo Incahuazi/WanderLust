@@ -27,11 +27,8 @@ import ShowEncounters.ScreenSlidePageFragment;
 
 public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity implements ScreenSlidePageFragment.OnFragmentInteractionListener {
 
-    private Encounter[] encounters;
-    /**
-     * The number of pages (wizard steps) to show in this demo.
-     */
-    private static final int NUM_PAGES = 5;
+    private Map EncountersMap = new HashMap<Integer,Encounter>();
+
     private int mMaxScrollSize;
 
     /**
@@ -50,55 +47,59 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen_slide);
 
-        readEncounters();
+        readEncounters(); //Reads encounters from db into EncountersMap HashMap
 
-        //add some encounter data
-        encounters = new Encounter[5];
-        encounters[0] = new Encounter();
-        encounters[0].Name = "Djengis Khan";
-        encounters[0].Message = "Rhaaaaa!!!";
-        encounters[0].Location = "Mongolia";
-        encounters[0].encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-        encounters[0].encounterPicture[0].imageFilePath = "Djengis image 1";
-        encounters[0].encounterPicture[1].imageFilePath = "Djengis image 2";
-        encounters[0].encounterPicture[2].imageFilePath = "Djengis image 3";
-
-        encounters[1] = new Encounter();
-        encounters[1].Name = "Grote smurf";
-        encounters[1].Message = "smurf";
-        encounters[1].Location = "Beestenbos";
-        encounters[1].encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-        encounters[1].encounterPicture[0].imageFilePath = "Grote smurf image 1";
-        encounters[1].encounterPicture[1].imageFilePath = "Grote smurf image 2";
-        encounters[1].encounterPicture[2].imageFilePath = "Grote smurf image 3";
-
-        encounters[2] = new Encounter();
-        encounters[2].Name = "Yoko Tsuno";
-        encounters[2].Message = "Konichiwa";
-        encounters[2].Location = "Japan";
-        encounters[2].encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-        encounters[2].encounterPicture[0].imageFilePath = "Yoko image 1";
-        encounters[2].encounterPicture[1].imageFilePath = "Yoko image 2";
-        encounters[2].encounterPicture[2].imageFilePath = "Yoko image 3";
-
-        encounters[3] = new Encounter();
-        encounters[3].Name = "PJ Harvey";
-        encounters[3].Message = "big fish little fish";
-        encounters[3].Location = "UK";
-        encounters[3].encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-        encounters[3].encounterPicture[0].imageFilePath = "PJ image 1";
-        encounters[3].encounterPicture[1].imageFilePath = "PJ image 2";
-        encounters[3].encounterPicture[2].imageFilePath = "PJ image 3";
-
-        encounters[4] = new Encounter();
-        encounters[4].Name = "Trump";
-        encounters[4].Message = "blablabla";
-        encounters[4].Location = "USA";
-        encounters[4].encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-        encounters[4].encounterPicture[0].imageFilePath = "Idiot image 1";
-        encounters[4].encounterPicture[1].imageFilePath = "Idiot image 2";
-        encounters[4].encounterPicture[2].imageFilePath = "Idiot image 3";
-
+//        Encounter encounter;
+//
+//        encounter = new Encounter();
+//        encounter.Name = "Djengis Khan";
+//        encounter.Message = "Rhaaaaa!!!";
+//        encounter.Location = "Mongolia";
+//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
+//        encounter.encounterPicture[0].imageFilePath = "";
+//        encounter.encounterPicture[1].imageFilePath = "";
+//        encounter.encounterPicture[2].imageFilePath = "";
+//        EncountersMap.put(EncountersMap.size(), encounter);
+//
+//        encounter = new Encounter();
+//        encounter.Name = "Grote smurf";
+//        encounter.Message = "smurf";
+//        encounter.Location = "Beestenbos";
+//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
+//        encounter.encounterPicture[0].imageFilePath = "";
+//        encounter.encounterPicture[1].imageFilePath = "";
+//        encounter.encounterPicture[2].imageFilePath = "";
+//        EncountersMap.put(EncountersMap.size(), encounter);
+//
+//        encounter = new Encounter();
+//        encounter.Name = "Yoko Tsuno";
+//        encounter.Message = "Konichiwa";
+//        encounter.Location = "Japan";
+//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
+//        encounter.encounterPicture[0].imageFilePath = "";
+//        encounter.encounterPicture[1].imageFilePath = "";
+//        encounter.encounterPicture[2].imageFilePath = "";
+//        EncountersMap.put(EncountersMap.size(), encounter);
+//
+//        encounter = new Encounter();
+//        encounter.Name = "PJ Harvey";
+//        encounter.Message = "big fish little fish";
+//        encounter.Location = "UK";
+//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
+//        encounter.encounterPicture[0].imageFilePath = "";
+//        encounter.encounterPicture[1].imageFilePath = "";
+//        encounter.encounterPicture[2].imageFilePath = "";
+//        EncountersMap.put(EncountersMap.size(), encounter);
+//
+//        encounter = new Encounter();
+//        encounter.Name = "Kabouter Wesley";
+//        encounter.Message = "Godmiljaar!";
+//        encounter.Location = "Beestenbos";
+//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
+//        encounter.encounterPicture[0].imageFilePath = "";
+//        encounter.encounterPicture[1].imageFilePath = "";
+//        encounter.encounterPicture[2].imageFilePath = "";
+//        EncountersMap.put(EncountersMap.size(), encounter);
 
 //        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(R.id.toolbar);
 
@@ -109,7 +110,7 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
     }
 
     private void readEncounters(){
-        Map result = new HashMap<Integer, Encounter>();
+        //Map result = new HashMap<Integer, Encounter>();
         WanderLustDbHelper dbHelper = new WanderLustDbHelper(this);
 
         try {
@@ -125,8 +126,8 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                     WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED +
                     " FROM " + WanderLustDb.EncounterTable.TABLE_NAME + " ET" +
                     " LEFT JOIN " + WanderLustDb.EncounterPictureTable.TABLE_NAME + " EPT" +
-                    " ON ET." + WanderLustDb.EncounterTable._ID + " = EPT." + WanderLustDb.EncounterPictureTable._ID +
-                    " ORDER BY ETID ASC";
+                    " ON ET." + WanderLustDb.EncounterTable._ID + " = EPT." + WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID +
+                    " ORDER BY ETID ASC, EPID ASC";
             Cursor cursor = db.rawQuery(allEncountersAndPicsQuery, null);
 
             int previousEncounterId = -1;
@@ -137,7 +138,7 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                 if (currentEncounterId==previousEncounterId){
                     //Same encounter, add picture
                     encounterPictureCounter++;
-                    Encounter encounter = (Encounter)result.get(encounterCounter);
+                    Encounter encounter = (Encounter)EncountersMap.get(encounterCounter-1);
                     EncounterPicture encounterPicture = new EncounterPicture();
                     encounterPicture.imageFilePath = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH));
                     encounterPicture.synced = (cursor.getInt(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED))==1);
@@ -146,7 +147,6 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                 }
                 else{
                     //next encounter, add new encounter
-                    encounterCounter++;
                     encounterPictureCounter = 0;
                     Encounter encounter = new Encounter();
                     encounter.Name = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_NAME));
@@ -159,7 +159,8 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
 
                     encounter.encounterPicture[encounterPictureCounter] = encounterPicture;
 
-                    result.put(encounterCounter, encounter);
+                    EncountersMap.put(encounterCounter, encounter);
+                    encounterCounter++;
                 }
                 previousEncounterId = currentEncounterId;
             }
@@ -205,12 +206,13 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
 
             ScreenSlidePageFragment screenSlidePageFragment = new ScreenSlidePageFragment();
             Bundle argsBundle = new Bundle();
-            argsBundle.putString("dataName", encounters[position].Name);
-            argsBundle.putString("dataMessage", encounters[position].Message);
-            argsBundle.putString("dataLocation", encounters[position].Location);
-            argsBundle.putString("Image1", encounters[position].encounterPicture[0].imageFilePath);
-            argsBundle.putString("Image2", encounters[position].encounterPicture[1].imageFilePath);
-            argsBundle.putString("Image3", encounters[position].encounterPicture[2].imageFilePath);
+
+            argsBundle.putString("dataName", ((Encounter)EncountersMap.get(position)).Name);
+            argsBundle.putString("dataMessage", ((Encounter)EncountersMap.get(position)).Message);
+            argsBundle.putString("dataLocation", ((Encounter)EncountersMap.get(position)).Location);
+            argsBundle.putString("Image1", ((Encounter)EncountersMap.get(position)).encounterPicture[0]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[0].imageFilePath);
+            argsBundle.putString("Image2", ((Encounter)EncountersMap.get(position)).encounterPicture[1]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[1].imageFilePath);;
+            argsBundle.putString("Image3", ((Encounter)EncountersMap.get(position)).encounterPicture[2]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[2].imageFilePath);;
 
             screenSlidePageFragment.setArguments(argsBundle);
             return screenSlidePageFragment;
@@ -219,17 +221,19 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
         @Override
         public void startUpdate(ViewGroup container) {
             super.startUpdate(container);
-            int currentItemTemp = mPager.getCurrentItem();
-            if (currentItemTemp!=currentItem){
-                currentItem = currentItemTemp;
-                TextView textView = (TextView) findViewById(R.id.TextViewProfileName);
-                textView.setText(encounters[currentItem].Name);
+            if (EncountersMap.size()!=0) {
+                int currentItemTemp = mPager.getCurrentItem();
+                if (currentItemTemp!=currentItem){
+                    currentItem = currentItemTemp;
+                    TextView textView = (TextView) findViewById(R.id.TextViewProfileName);
+                    textView.setText(((Encounter)EncountersMap.get(currentItem)).Name);
+                }
             }
         }
 
         @Override
         public int getCount() {
-            return NUM_PAGES;
+            return EncountersMap.size();
         }
     }
 }
