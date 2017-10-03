@@ -76,7 +76,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_encounter);
 
-        setupHideKeyboard(findViewById(R.id.tableLayout));
+        setupHideKeyboard(findViewById(R.id.linearLayout));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -177,7 +177,8 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         if (!inputValid){
             return;
         }
-
+        String newEncounterId = UUID.randomUUID().toString();
+        encounterValues.put(WanderLustDb.EncounterTable._ID, newEncounterId);
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_NAME, strTextInputName);
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY, strTextInputLocationCity);
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY, strTextInputLocationCountry);
@@ -191,12 +192,13 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
 
         db.beginTransaction();
         try {
-            long newEncounterId = db.insert(WanderLustDb.EncounterTable.TABLE_NAME, null, encounterValues);
+            db.insert(WanderLustDb.EncounterTable.TABLE_NAME, null, encounterValues);
             for (EncounterPicture encounterPicture: this.encounter.encounterPicture
                  ) {
                 if (encounterPicture != null && encounterPicture.imageFilePath !=""){
                     //picture exists
                     ContentValues encounterPictureValues = new ContentValues();
+                    encounterPictureValues.put(WanderLustDb.EncounterPictureTable._ID, UUID.randomUUID().toString());
                     encounterPictureValues.put(WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID, newEncounterId);
                     encounterPictureValues.put(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH, encounterPicture.imageFilePath);
                     encounterPictureValues.put(WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED, 0);
@@ -280,10 +282,10 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
 
                     ImageView imageView = pics[currentPicture];
                     imageView.setImageResource(android.R.drawable.ic_menu_camera);
-                    imageView.setRotation(0);
+//                    imageView.setRotation(0);
 
-                    Resources r = getResources();
-                    imageView.getLayoutParams().height = r.getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
+//                    Resources r = getResources();
+//                    imageView.getLayoutParams().height = r.getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
                     this.encounter.encounterPicture[currentPicture].imageFilePath = "";
                     break;
             }
@@ -292,10 +294,6 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     }
 
     private void setPic(ImageView mImageView, String imageFilePath) {
-
-        mImageView.getLayoutParams().height = 620;
-        mImageView.getLayoutParams().width = 620;
-        mImageView.requestLayout();
         File picture = new File(imageFilePath);
         Glide.with(this).load(picture).into(mImageView);
 

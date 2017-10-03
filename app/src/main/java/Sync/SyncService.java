@@ -18,6 +18,8 @@ import Database.WanderLustDb;
 import Database.WanderLustDbHelper;
 import Entity.Encounter;
 
+import static java.util.regex.Pattern.quote;
+
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -31,12 +33,12 @@ public class SyncService extends IntentService {
     private WanderLustDbHelper dbHelper = null;
     private SQLiteDatabase db = null;
 
-    private static final String Env = "D";
+    private static final String Env = "T";
 
     private static final String baseApiUrl =
-        (Env=="D")? "http://192.168.0.235/Wanderlust.WebAPI/api":
-        (Env=="T")? "http://gowanderlust-testing.azurewebsites.net/Wanderlust.WebAPI/api":
-        (Env=="P")? "http://gowanderlust.azurewebsites.net/Wanderlust.WebAPI/api": "wrong env param";
+        (Env.equals("D"))? "http://192.168.0.235/Wanderlust.WebAPI/api":
+        (Env.equals("T"))? "http://gowanderlust-testing.azurewebsites.net/Wanderlust.WebAPI/api":
+        (Env.equals("P"))? "http://gowanderlust.azurewebsites.net/Wanderlust.WebAPI/api": "wrong env param";
 
 
     public SyncService() {super("SyncService");}
@@ -74,23 +76,23 @@ public class SyncService extends IntentService {
                     WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE + ", " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY + ", " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY + ", " +
-                    WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP + ", " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP + " AS ETInserted, " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_LATLONG +
                     " FROM " + WanderLustDb.EncounterTable.TABLE_NAME + " ET" +
                     " WHERE NOT " + WanderLustDb.EncounterTable.COLUMN_NAME_SYNCED + " =1" +
-                    " ORDER BY ETID ASC";
+                    " ORDER BY ETInserted ASC";
 
             Cursor cursor = db.rawQuery(allUnsyncedEncounters, null);
 
             while(cursor.moveToNext()) {
-                int currentEncounterId = cursor.getInt(cursor.getColumnIndex("ETID"));
+                String currentEncounterId = cursor.getString(cursor.getColumnIndex("ETID"));
                 Encounter encounter = new Encounter();
                 encounter.Name = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_NAME));
                 encounter.Message = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE));
                 encounter.LocationCity = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY));
                 encounter.LocationCountry = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY));
                 encounter.LocationLatLong = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_LATLONG));
-                encounter.InsertedTimeStamp = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP));
+                encounter.InsertedTimeStamp = cursor.getString(cursor.getColumnIndex("ETInserted"));
                 uploadEncounter(currentEncounterId, encounter);
             }
         }catch (Exception e){
@@ -111,8 +113,8 @@ public class SyncService extends IntentService {
             Cursor cursor = db.rawQuery(allUnsyncedEncounterPictures, null);
 
             while(cursor.moveToNext()) {
-                int currentEncounterPictureId = cursor.getInt(cursor.getColumnIndex("EPTID"));
-                int encounterId = cursor.getInt(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID));
+                String currentEncounterPictureId = cursor.getString(cursor.getColumnIndex("EPTID"));
+                String encounterId = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID));
                 String encounterPictureImagePath = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH));
                 uploadEncounterPicture(currentEncounterPictureId, encounterId, encounterPictureImagePath);
             }
@@ -121,7 +123,7 @@ public class SyncService extends IntentService {
         }
     }
 
-    private void uploadEncounterPicture(int encounterPictureId, int encounterId, String encounterPictureImagePath) {
+    private void uploadEncounterPicture(String encounterPictureId, String encounterId, String encounterPictureImagePath) {
         URL url;
         HttpURLConnection urlConnection = null;
         DataOutputStream printout;
@@ -163,7 +165,7 @@ public class SyncService extends IntentService {
         }
     }
 
-    private void uploadEncounter(int encounterId, Encounter encounter){
+    private void uploadEncounter(String encounterId, Encounter encounter){
         URL url;
         HttpURLConnection urlConnection = null;
         DataOutputStream printout;
@@ -202,15 +204,15 @@ public class SyncService extends IntentService {
             if(urlConnection != null) urlConnection.disconnect();
         }
     }
-    private void setEncounterSynced(int encounterId){
+    private void setEncounterSynced(String encounterId){
         ContentValues cv = new ContentValues();
         cv.put(WanderLustDb.EncounterTable.COLUMN_NAME_SYNCED, 1);
-        db.update(WanderLustDb.EncounterTable.TABLE_NAME, cv, WanderLustDb.EncounterTable._ID + " = " + encounterId,null);
+        db.update(WanderLustDb.EncounterTable.TABLE_NAME, cv, WanderLustDb.EncounterTable._ID + " = \"" + encounterId + "\"",null);
     }
 
-    private void setEncounterPictureSynced(int encounterPictureId){
+    private void setEncounterPictureSynced(String encounterPictureId){
         ContentValues cv = new ContentValues();
         cv.put(WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED, 1);
-        db.update(WanderLustDb.EncounterPictureTable.TABLE_NAME, cv, WanderLustDb.EncounterPictureTable._ID + " = " + encounterPictureId,null);
+        db.update(WanderLustDb.EncounterPictureTable.TABLE_NAME, cv, WanderLustDb.EncounterPictureTable._ID + " = \"" + encounterPictureId + "\"" ,null);
     }
 }

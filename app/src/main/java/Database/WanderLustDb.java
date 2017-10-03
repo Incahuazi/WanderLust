@@ -36,7 +36,7 @@ public final class WanderLustDb {
 
     public static final String SQL_CREATE_ENCOUNTERTABLE =
             "CREATE TABLE " + EncounterTable.TABLE_NAME + " (" +
-                    EncounterTable._ID + " INTEGER PRIMARY KEY," +
+                    EncounterTable._ID + " TEXT PRIMARY KEY," +
                     EncounterTable.COLUMN_NAME_NAME + " TEXT," +
                     EncounterTable.COLUMN_NAME_LOCATION_CITY + " TEXT," +
                     EncounterTable.COLUMN_NAME_LOCATION_COUNTRY + " TEXT," +
@@ -48,8 +48,8 @@ public final class WanderLustDb {
 
     public static final String SQL_CREATE_ENCOUNTERPICTURETABLE =
             "CREATE TABLE " + EncounterPictureTable.TABLE_NAME + " (" +
-                    EncounterPictureTable._ID + " INTEGER PRIMARY KEY," +
-                    EncounterPictureTable.COLUMN_NAME_ENCOUNTERID + " INTEGER NOT NULL," +
+                    EncounterPictureTable._ID + " TEXT PRIMARY KEY," +
+                    EncounterPictureTable.COLUMN_NAME_ENCOUNTERID + " TEXT NOT NULL," +
                     EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH + " TEXT," +
                     EncounterPictureTable.COLUMN_NAME_SYNCED + " INTEGER)"
             ;

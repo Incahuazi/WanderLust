@@ -3,6 +3,7 @@ package be.ictera.wanderlust;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
@@ -69,21 +70,22 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                     WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE + ", " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY + ", " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY + ", " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP + " AS ETInserted, " +
                     "EPT." + WanderLustDb.EncounterPictureTable._ID + " AS EPID, " +
                     WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH + ", " +
                     "EPT." + WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED +
                     " FROM " + WanderLustDb.EncounterTable.TABLE_NAME + " ET" +
                     " LEFT JOIN " + WanderLustDb.EncounterPictureTable.TABLE_NAME + " EPT" +
                     " ON ET." + WanderLustDb.EncounterTable._ID + " = EPT." + WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID +
-                    " ORDER BY ETID ASC, EPID ASC";
+                    " ORDER BY ETInserted DESC";
             Cursor cursor = db.rawQuery(allEncountersAndPicsQuery, null);
 
-            int previousEncounterId = -1;
+            String previousEncounterId = "";
             int encounterCounter = 0;
             int encounterPictureCounter = 0;
             while(cursor.moveToNext()) {
-                int currentEncounterId = cursor.getInt(cursor.getColumnIndex("ETID"));
-                if (currentEncounterId==previousEncounterId){
+                String currentEncounterId = cursor.getString(cursor.getColumnIndex("ETID"));
+                if (currentEncounterId.equals(previousEncounterId)){
                     //Same encounter, add picture
                     encounterPictureCounter++;
                     Encounter encounter = (Encounter)EncountersMap.get(encounterCounter-1);
