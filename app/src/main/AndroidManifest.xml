@@ -5,10 +5,18 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
+
+    <receiver android:name=".NetworkStateChecker">
+        <intent-filter>
+            <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+        </intent-filter>
+    </receiver>
 
     <application
         android:allowBackup="true"
@@ -46,6 +54,11 @@
         <activity android:name=".ShowEncounterScreenSlidePagerActivity" />
         <activity android:name=".HomeScreenActivity" />
 
+        <service
+            android:name="Sync.SyncService"
+            android:exported="false" />
+
+        <activity android:name=".DisplayPictureActivity_readonly"></activity>
     </application>
 
 </manifest>

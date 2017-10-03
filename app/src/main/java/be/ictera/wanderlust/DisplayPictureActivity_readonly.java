@@ -3,26 +3,22 @@ package be.ictera.wanderlust;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ZoomButtonsController;
 
 import com.bumptech.glide.Glide;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.File;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
-public class DisplayPictureActivity extends AppCompatActivity {
+public class DisplayPictureActivity_readonly extends AppCompatActivity {
+
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -42,6 +38,7 @@ public class DisplayPictureActivity extends AppCompatActivity {
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
+
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -59,6 +56,7 @@ public class DisplayPictureActivity extends AppCompatActivity {
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
     };
+
     private View mControlsView;
     private final Runnable mShowPart2Runnable = new Runnable() {
         @Override
@@ -96,8 +94,7 @@ public class DisplayPictureActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_displaypicturefullscreen);
+        setContentView(R.layout.activity_display_picture_readonly);
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
@@ -108,7 +105,6 @@ public class DisplayPictureActivity extends AppCompatActivity {
         File picture = new File(getIntent().getStringExtra("ImagePath"));
 
         Glide.with(this).load(picture).into(foo);
-//        foo.setRotation(90);
 
         PhotoView photoView = (PhotoView) findViewById(R.id.fullscreen_content);
 
@@ -125,41 +121,16 @@ public class DisplayPictureActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
 
-        ImageButton buttonSave = (ImageButton)findViewById(R.id.ButtonSave);
-        ImageButton buttonDelete = (ImageButton)findViewById(R.id.ButtonDelete);
-        buttonSave.setOnTouchListener(mDelayHideTouchListener);
-        buttonDelete.setOnTouchListener(mDelayHideTouchListener);
+        ImageButton buttonBack = (ImageButton)findViewById(R.id.ButtonBack);
+        buttonBack.setOnTouchListener(mDelayHideTouchListener);
 
-        buttonSave.setOnClickListener(new View.OnClickListener() {
+        buttonBack.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ButtonSaveClicked(v);
-            }});
-
-        buttonDelete.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ButtonDeleteClicked(v);
+                ButtonCloseClicked(v);
             }});
     }
-    private void ButtonDeleteClicked(View v) {
-        Intent data = new Intent();
-        data.putExtra("ButtonClicked", "DeleteClicked");
-        if (getParent() == null) {
-            setResult(Activity.RESULT_OK, data);
-        } else {
-            getParent().setResult(Activity.RESULT_OK, data);
-        }
-        finish();
-    }
 
-    private void ButtonSaveClicked(View view){
-        Intent data = new Intent();
-        data.putExtra("ButtonClicked", "SaveClicked");
-
-        if (getParent() == null) {
-            setResult(Activity.RESULT_OK, data);
-        } else {
-            getParent().setResult(Activity.RESULT_OK, data);
-        }
+    private void ButtonCloseClicked(View view){
         finish();
     }
 

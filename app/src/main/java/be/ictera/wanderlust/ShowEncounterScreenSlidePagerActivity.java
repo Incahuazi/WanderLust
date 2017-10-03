@@ -49,58 +49,6 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
 
         readEncounters(); //Reads encounters from db into EncountersMap HashMap
 
-//        Encounter encounter;
-//
-//        encounter = new Encounter();
-//        encounter.Name = "Djengis Khan";
-//        encounter.Message = "Rhaaaaa!!!";
-//        encounter.Location = "Mongolia";
-//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-//        encounter.encounterPicture[0].imageFilePath = "";
-//        encounter.encounterPicture[1].imageFilePath = "";
-//        encounter.encounterPicture[2].imageFilePath = "";
-//        EncountersMap.put(EncountersMap.size(), encounter);
-//
-//        encounter = new Encounter();
-//        encounter.Name = "Grote smurf";
-//        encounter.Message = "smurf";
-//        encounter.Location = "Beestenbos";
-//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-//        encounter.encounterPicture[0].imageFilePath = "";
-//        encounter.encounterPicture[1].imageFilePath = "";
-//        encounter.encounterPicture[2].imageFilePath = "";
-//        EncountersMap.put(EncountersMap.size(), encounter);
-//
-//        encounter = new Encounter();
-//        encounter.Name = "Yoko Tsuno";
-//        encounter.Message = "Konichiwa";
-//        encounter.Location = "Japan";
-//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-//        encounter.encounterPicture[0].imageFilePath = "";
-//        encounter.encounterPicture[1].imageFilePath = "";
-//        encounter.encounterPicture[2].imageFilePath = "";
-//        EncountersMap.put(EncountersMap.size(), encounter);
-//
-//        encounter = new Encounter();
-//        encounter.Name = "PJ Harvey";
-//        encounter.Message = "big fish little fish";
-//        encounter.Location = "UK";
-//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-//        encounter.encounterPicture[0].imageFilePath = "";
-//        encounter.encounterPicture[1].imageFilePath = "";
-//        encounter.encounterPicture[2].imageFilePath = "";
-//        EncountersMap.put(EncountersMap.size(), encounter);
-//
-//        encounter = new Encounter();
-//        encounter.Name = "Kabouter Wesley";
-//        encounter.Message = "Godmiljaar!";
-//        encounter.Location = "Beestenbos";
-//        encounter.encounterPicture = new EncounterPicture[] {new EncounterPicture(), new EncounterPicture(), new EncounterPicture()};
-//        encounter.encounterPicture[0].imageFilePath = "";
-//        encounter.encounterPicture[1].imageFilePath = "";
-//        encounter.encounterPicture[2].imageFilePath = "";
-//        EncountersMap.put(EncountersMap.size(), encounter);
-
 //        ((AppCompatActivity) getActivity()).getSupportActionBar().setSubtitle(R.id.toolbar);
 
         // Instantiate a ViewPager and a PagerAdapter.
@@ -110,7 +58,6 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
     }
 
     private void readEncounters(){
-        //Map result = new HashMap<Integer, Encounter>();
         WanderLustDbHelper dbHelper = new WanderLustDbHelper(this);
 
         try {
@@ -120,10 +67,11 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                     "ET." + WanderLustDb.EncounterTable._ID + " AS ETID, " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_NAME + ", " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE + ", " +
-                    WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION + ", " +
-                    "EPT." +WanderLustDb.EncounterPictureTable._ID + " AS EPID, " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY + ", " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY + ", " +
+                    "EPT." + WanderLustDb.EncounterPictureTable._ID + " AS EPID, " +
                     WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH + ", " +
-                    WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED +
+                    "EPT." + WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED +
                     " FROM " + WanderLustDb.EncounterTable.TABLE_NAME + " ET" +
                     " LEFT JOIN " + WanderLustDb.EncounterPictureTable.TABLE_NAME + " EPT" +
                     " ON ET." + WanderLustDb.EncounterTable._ID + " = EPT." + WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID +
@@ -151,7 +99,8 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                     Encounter encounter = new Encounter();
                     encounter.Name = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_NAME));
                     encounter.Message = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE));
-                    encounter.Location = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION));
+                    encounter.LocationCity = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY));
+                    encounter.LocationCountry = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY));
 
                     EncounterPicture encounterPicture = new EncounterPicture();
                     encounterPicture.imageFilePath =  cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH));
@@ -172,7 +121,7 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
 
     @Override
     public void onImageClicked(String imagePath) {
-        Intent intent = new Intent(this, DisplayPictureActivity.class);
+        Intent intent = new Intent(this, DisplayPictureActivity_readonly.class);
         intent.putExtra("ImagePath", imagePath);
 
         startActivity(intent);
@@ -209,7 +158,8 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
 
             argsBundle.putString("dataName", ((Encounter)EncountersMap.get(position)).Name);
             argsBundle.putString("dataMessage", ((Encounter)EncountersMap.get(position)).Message);
-            argsBundle.putString("dataLocation", ((Encounter)EncountersMap.get(position)).Location);
+            String LocationText = ((Encounter)EncountersMap.get(position)).LocationCity + ", " + ((Encounter)EncountersMap.get(position)).LocationCountry;
+            argsBundle.putString("dataLocation", LocationText);
             argsBundle.putString("Image1", ((Encounter)EncountersMap.get(position)).encounterPicture[0]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[0].imageFilePath);
             argsBundle.putString("Image2", ((Encounter)EncountersMap.get(position)).encounterPicture[1]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[1].imageFilePath);;
             argsBundle.putString("Image3", ((Encounter)EncountersMap.get(position)).encounterPicture[2]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[2].imageFilePath);;

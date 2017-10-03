@@ -2,7 +2,9 @@ package be.ictera.wanderlust;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.ListView;
 
 import SelectLanguage.LanguageItem;
 import SelectLanguage.LanguageListAdapter;
+import Sync.NetworkStateChecker;
 
 public class LanguageSelectActivity extends ListActivity {
 
@@ -18,6 +21,8 @@ public class LanguageSelectActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        registerReceiver(new NetworkStateChecker(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         LanguageItem[] languageItems = new LanguageItem[3];
 

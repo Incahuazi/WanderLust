@@ -19,8 +19,11 @@ public final class WanderLustDb {
         public static final String TABLE_NAME = "Encounter_OP";
         public static final String COLUMN_NAME_NAME = "Name";
         public static final String COLUMN_NAME_MESSAGE = "Message";
-        public static final String COLUMN_NAME_LOCATION = "Location";
+        public static final String COLUMN_NAME_LOCATION_CITY = "LocationCity";
+        public static final String COLUMN_NAME_LOCATION_COUNTRY = "LocationCountry";
         public static final String COLUMN_NAME_LOCATION_LATLONG = "LocationLatLong";
+        public static final String COLUMN_NAME_SYNCED = "Synced";
+        public static final String COLUMN_NAME_INSERTEDTIMESTAMP = "InsertedTimestamp";
     }
 
     public static class EncounterPictureTable implements  BaseColumns{
@@ -35,8 +38,11 @@ public final class WanderLustDb {
             "CREATE TABLE " + EncounterTable.TABLE_NAME + " (" +
                     EncounterTable._ID + " INTEGER PRIMARY KEY," +
                     EncounterTable.COLUMN_NAME_NAME + " TEXT," +
-                    EncounterTable.COLUMN_NAME_LOCATION + " TEXT," +
+                    EncounterTable.COLUMN_NAME_LOCATION_CITY + " TEXT," +
+                    EncounterTable.COLUMN_NAME_LOCATION_COUNTRY + " TEXT," +
                     EncounterTable.COLUMN_NAME_LOCATION_LATLONG + " TEXT," +
+                    EncounterTable.COLUMN_NAME_SYNCED + " INTEGER," +
+                    EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP + " TEXT, " +
                     EncounterTable.COLUMN_NAME_MESSAGE + " TEXT)"
             ;
 

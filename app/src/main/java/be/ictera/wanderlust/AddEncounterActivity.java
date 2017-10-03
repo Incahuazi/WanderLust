@@ -17,13 +17,16 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -48,6 +51,10 @@ import Database.WanderLustDb;
 import Database.WanderLustDbHelper;
 import Entity.Encounter;
 import Entity.EncounterPicture;
+import Helper.helper;
+import Sync.NetworkStateChecker;
+
+import static Helper.helper.GetUTCdatetimeAsString;
 
 public class AddEncounterActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
@@ -60,6 +67,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     private LocationRequest mLocationRequest;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private Location location;
+    private NetworkStateChecker networkStateChecker = new NetworkStateChecker();
 
     ImageView[] pics = new ImageView[3];
 
@@ -67,6 +75,9 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_encounter);
+
+        setupHideKeyboard(findViewById(R.id.tableLayout));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -133,6 +144,16 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         }
     }
 
+    private boolean validateInput(String strTextInputName, String errorMsg, int textInputLayoutId){
+
+        if (strTextInputName ==null||strTextInputName.isEmpty()){
+            TextInputLayout textInputLayout = (TextInputLayout)findViewById(textInputLayoutId);
+            textInputLayout.setError(errorMsg);
+            return false;
+        }
+        else return true;
+    }
+
     private void onEncounterSave() {
         WanderLustDbHelper dbhelper = new WanderLustDbHelper(this);
         SQLiteDatabase db = dbhelper.getWritableDatabase();
@@ -140,14 +161,33 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
 
         EditText textInputName = (EditText)findViewById(R.id.TextInputName);
         EditText textInputMessage = (EditText)findViewById(R.id.TextInputMessage);
+        EditText textInputLocationCity = (EditText)findViewById(R.id.TextInputLocationCity);
+        EditText textInputLocationCountry = (EditText)findViewById(R.id.TextInputLocationCountry);
 
+        String strTextInputName = textInputName.getText().toString();
+        String strTextInputMessage = textInputMessage.getText().toString();
+        String strTextInputLocationCity = textInputLocationCity.getText().toString();
+        String strTextInputLocationCountry = textInputLocationCountry.getText().toString();
 
-        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_NAME, textInputName.getText().toString());
-        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION, "somelocation");
-        if (this.location != null) {
-            encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_LATLONG, this.location.toString());
+        boolean inputValid;
+        inputValid = validateInput(strTextInputName, "Please enter your name", R.id.TextInputNameLayout);
+        inputValid &= validateInput(strTextInputLocationCity, "Please enter your location", R.id.TextInputLocationCityLayout);
+        inputValid &= validateInput(strTextInputLocationCountry, "Please enter your location", R.id.TextInputLocationCountryLayout);
+
+        if (!inputValid){
+            return;
         }
-        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE, textInputMessage.getText().toString());
+
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_NAME, strTextInputName);
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY, strTextInputLocationCity);
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY, strTextInputLocationCountry);
+        if (this.location != null) {
+            String locationLatLong = this.location.getLatitude() + ";" + this.location.getLongitude();
+            encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_LATLONG, locationLatLong);
+        }
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE, strTextInputMessage);
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_SYNCED, 0);
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP, GetUTCdatetimeAsString());
 
         db.beginTransaction();
         try {
@@ -173,6 +213,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         finally{
             db.endTransaction();
         }
+        networkStateChecker.tryToSync(this);
         this.finish();
     }
 
@@ -249,10 +290,11 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
 
         }
     }
+
     private void setPic(ImageView mImageView, String imageFilePath) {
 
-        mImageView.getLayoutParams().height = 520;
-        mImageView.getLayoutParams().width = 520;
+        mImageView.getLayoutParams().height = 620;
+        mImageView.getLayoutParams().width = 620;
         mImageView.requestLayout();
         File picture = new File(imageFilePath);
         Glide.with(this).load(picture).into(mImageView);
@@ -265,7 +307,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         }
         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
 
-        mImageView.setRotation(90);
+//        mImageView.setRotation(90);
     }
 
     @Override
@@ -275,7 +317,6 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
 
     @Override
     public void onConnectionSuspended(int i) {
-
     }
 
     @Override
@@ -316,7 +357,25 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     private void handleNewLocation(Location location){
         Log.d("GetLocation", String.valueOf(location.getLatitude()));
         this.location = location;
-        Toast toast = Toast.makeText(getApplicationContext(), String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT);
-        toast.show();
+    }
+
+    public void setupHideKeyboard(View view) {
+        // Set up touch listener for non-text box views to hide keyboard.
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    helper.hideSoftKeyboard(AddEncounterActivity.this);
+                    return false;
+                }
+            });
+        }
+
+        //If a layout container, iterate over children and seed recursion.
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupHideKeyboard(innerView);
+            }
+        }
     }
 }
