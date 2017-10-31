@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.media.ExifInterface;
@@ -18,11 +17,11 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,16 +34,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
+import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.UUID;
 
 import Database.WanderLustDb;
@@ -60,6 +57,9 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int SHOW_PICTURE_REQUEST = 2;
+    private static final String BUNDLE_DATA_ENCOUNTER = "EncounterJson";
+    private static final String BUNDLE_DATA_CURRENTPIC = "CurrentPicture";
+
     static int currentPicture = 0;
     public Encounter encounter;
     private static final int PERMISSION_REQUEST_CODE_LOCATION = 1;
@@ -100,7 +100,26 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
                 }
             });
         }
-        encounter = new Encounter();
+        if (savedInstanceState!=null && savedInstanceState.containsKey(BUNDLE_DATA_ENCOUNTER))
+        {
+            Gson gson = new Gson();
+            encounter = gson.fromJson(savedInstanceState.getString(BUNDLE_DATA_ENCOUNTER), Encounter.class);
+            for (int i=0;i<encounter.encounterPicture.length;i++){
+                if (encounter.encounterPicture[i] !=null){
+                    String imageFilePath = encounter.encounterPicture[i].imageFilePath;
+                    if (imageFilePath !=null && !TextUtils.isEmpty(imageFilePath)){
+                        setPic(pics[i], encounter.encounterPicture[i].imageFilePath);
+                    }
+                }
+            }
+        }
+        else{
+            encounter = new Encounter();
+        }
+
+        if (savedInstanceState !=null && savedInstanceState.containsKey(BUNDLE_DATA_CURRENTPIC)){
+            currentPicture = savedInstanceState.getInt(BUNDLE_DATA_CURRENTPIC);
+        }
 
         //start a client for location requests
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -154,6 +173,23 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         else return true;
     }
 
+    private boolean validateInputEmail(String strTextInputEmail, String errorMsg, int textInputLayoutId) {
+        if (!(strTextInputEmail ==null||strTextInputEmail.isEmpty())){
+            //email address filled in, check if it has valid format
+
+            if (android.util.Patterns.EMAIL_ADDRESS.matcher(strTextInputEmail).matches()==false){
+                TextInputLayout textInputLayout = (TextInputLayout)findViewById(textInputLayoutId);
+                textInputLayout.setError(errorMsg);
+                return false;
+            }
+            else return true;
+        }
+        else {
+            //email address is optional
+            return true;
+        }
+    }
+
     private void onEncounterSave() {
         WanderLustDbHelper dbhelper = new WanderLustDbHelper(this);
         SQLiteDatabase db = dbhelper.getWritableDatabase();
@@ -163,16 +199,20 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         EditText textInputMessage = (EditText)findViewById(R.id.TextInputMessage);
         EditText textInputLocationCity = (EditText)findViewById(R.id.TextInputLocationCity);
         EditText textInputLocationCountry = (EditText)findViewById(R.id.TextInputLocationCountry);
+        EditText textInputEmail = (EditText)findViewById(R.id.TextInputEmail);
 
         String strTextInputName = textInputName.getText().toString();
         String strTextInputMessage = textInputMessage.getText().toString();
         String strTextInputLocationCity = textInputLocationCity.getText().toString();
         String strTextInputLocationCountry = textInputLocationCountry.getText().toString();
+        String strTextInputEmail = textInputEmail.getText().toString();
 
         boolean inputValid;
         inputValid = validateInput(strTextInputName, "Please enter your name", R.id.TextInputNameLayout);
         inputValid &= validateInput(strTextInputLocationCity, "Please enter your location", R.id.TextInputLocationCityLayout);
         inputValid &= validateInput(strTextInputLocationCountry, "Please enter your location", R.id.TextInputLocationCountryLayout);
+        inputValid &= validateInputEmail(strTextInputEmail, "Please enter a valid email address", R.id.TextInputEmailLayout);
+
 
         if (!inputValid){
             return;
@@ -189,13 +229,14 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_MESSAGE, strTextInputMessage);
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_SYNCED, 0);
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP, GetUTCdatetimeAsString());
+        encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_EMAILADDRESS, strTextInputEmail);
 
         db.beginTransaction();
         try {
             db.insert(WanderLustDb.EncounterTable.TABLE_NAME, null, encounterValues);
             for (EncounterPicture encounterPicture: this.encounter.encounterPicture
                  ) {
-                if (encounterPicture != null && encounterPicture.imageFilePath !=""){
+                if (encounterPicture != null && !TextUtils.isEmpty(encounterPicture.imageFilePath)){
                     //picture exists
                     ContentValues encounterPictureValues = new ContentValues();
                     encounterPictureValues.put(WanderLustDb.EncounterPictureTable._ID, UUID.randomUUID().toString());
@@ -216,11 +257,13 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
             db.endTransaction();
         }
         networkStateChecker.tryToSync(this);
+        Intent i = new Intent(getApplicationContext(), ThanksActivity.class);
         this.finish();
+        startActivity(i);
     }
 
     protected void onClickListener(int item){
-        if (encounter.encounterPicture[item] == null || encounter.encounterPicture[item].imageFilePath == ""){
+        if (encounter.encounterPicture[item] == null || TextUtils.isEmpty(encounter.encounterPicture[item].imageFilePath)){
             //no picture available yet
             dispatchTakePictureIntent(item);
         }
@@ -231,6 +274,21 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
             currentPicture = item;
             startActivityForResult(intent, SHOW_PICTURE_REQUEST);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+
+        //save encounter to bundle
+        Gson gson = new Gson();
+        String encounterJson = gson.toJson(encounter);
+        outState.putString(BUNDLE_DATA_ENCOUNTER, encounterJson);
+
+        //save currentPicture
+        outState.putInt(BUNDLE_DATA_CURRENTPIC, currentPicture);
+
+        //TODO: Location
     }
 
     private void dispatchTakePictureIntent(int item) {

@@ -162,9 +162,12 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
             argsBundle.putString("dataMessage", ((Encounter)EncountersMap.get(position)).Message);
             String LocationText = ((Encounter)EncountersMap.get(position)).LocationCity + ", " + ((Encounter)EncountersMap.get(position)).LocationCountry;
             argsBundle.putString("dataLocation", LocationText);
-            argsBundle.putString("Image1", ((Encounter)EncountersMap.get(position)).encounterPicture[0]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[0].imageFilePath);
-            argsBundle.putString("Image2", ((Encounter)EncountersMap.get(position)).encounterPicture[1]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[1].imageFilePath);;
-            argsBundle.putString("Image3", ((Encounter)EncountersMap.get(position)).encounterPicture[2]==null?"":((Encounter)EncountersMap.get(position)).encounterPicture[2].imageFilePath);;
+            argsBundle.putString("Image1", ((Encounter)EncountersMap.get(position)).encounterPicture[0]==null?
+                    "":((Encounter)EncountersMap.get(position)).encounterPicture[0].imageFilePath);
+            argsBundle.putString("Image2", ((Encounter)EncountersMap.get(position)).encounterPicture[1]==null?
+                    "":((Encounter)EncountersMap.get(position)).encounterPicture[1].imageFilePath);;
+            argsBundle.putString("Image3", ((Encounter)EncountersMap.get(position)).encounterPicture[2]==null?
+                    "":((Encounter)EncountersMap.get(position)).encounterPicture[2].imageFilePath);;
 
             screenSlidePageFragment.setArguments(argsBundle);
             return screenSlidePageFragment;

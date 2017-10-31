@@ -2,9 +2,12 @@ package Sync;
 
 import android.app.IntentService;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import org.json.JSONObject;
 import java.io.DataInputStream;
@@ -55,8 +58,18 @@ public class SyncService extends IntentService {
         try {
             Log.d(TAG, "onHandleIntent: starting service");
             if (intent != null) {
-                SyncEncounters();
-                SyncEncounterPictures();
+
+                while (SyncEncounters()==false){
+                    if (IsNetworkConnected()==false){
+                        break;
+                    }
+                }
+
+                while (SyncEncounterPictures() ==false){
+                    if (IsNetworkConnected()==false){
+                        break;
+                    }
+                }
             }
             Log.d(TAG, "Service Stopping!");
         } catch (Exception e){
@@ -67,7 +80,20 @@ public class SyncService extends IntentService {
         }
     }
 
-    private void SyncEncounters(){
+    private boolean IsNetworkConnected(){
+        ConnectivityManager cm = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null) {
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI || activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE){
+                Log.d(TAG, "IsNetworkConnected: network detected");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean SyncEncounters(){
+        boolean result = true;
         try {
             //first sync all encounters without pictures
             String allUnsyncedEncounters = "SELECT " +
@@ -77,7 +103,8 @@ public class SyncService extends IntentService {
                     WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY + ", " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY + ", " +
                     WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP + " AS ETInserted, " +
-                    WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_LATLONG +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_LATLONG + ", " +
+                    WanderLustDb.EncounterTable.COLUMN_NAME_EMAILADDRESS +
                     " FROM " + WanderLustDb.EncounterTable.TABLE_NAME + " ET" +
                     " WHERE NOT " + WanderLustDb.EncounterTable.COLUMN_NAME_SYNCED + " =1" +
                     " ORDER BY ETInserted ASC";
@@ -92,15 +119,21 @@ public class SyncService extends IntentService {
                 encounter.LocationCity = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_CITY));
                 encounter.LocationCountry = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_COUNTRY));
                 encounter.LocationLatLong = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_LOCATION_LATLONG));
+                encounter.EmailAddress = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterTable.COLUMN_NAME_EMAILADDRESS));
                 encounter.InsertedTimeStamp = cursor.getString(cursor.getColumnIndex("ETInserted"));
-                uploadEncounter(currentEncounterId, encounter);
+
+                if(uploadEncounter(currentEncounterId, encounter)==false) result=false;
             }
         }catch (Exception e){
             e.printStackTrace();
+            result = false;
         }
+
+        return result;
     }
 
-    private void SyncEncounterPictures(){
+    private boolean SyncEncounterPictures(){
+        boolean result = true;
         try {
             //next try to upload the pictures
             String allUnsyncedEncounterPictures = "SELECT " +
@@ -116,17 +149,22 @@ public class SyncService extends IntentService {
                 String currentEncounterPictureId = cursor.getString(cursor.getColumnIndex("EPTID"));
                 String encounterId = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_ENCOUNTERID));
                 String encounterPictureImagePath = cursor.getString(cursor.getColumnIndex(WanderLustDb.EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH));
-                uploadEncounterPicture(currentEncounterPictureId, encounterId, encounterPictureImagePath);
+                if(uploadEncounterPicture(currentEncounterPictureId, encounterId, encounterPictureImagePath)==false) result=false;
             }
+            return true;
         }catch (Exception e){
             e.printStackTrace();
+            result = false;
         }
+
+        return result;
     }
 
-    private void uploadEncounterPicture(String encounterPictureId, String encounterId, String encounterPictureImagePath) {
+    private boolean uploadEncounterPicture(String encounterPictureId, String encounterId, String encounterPictureImagePath) {
         URL url;
         HttpURLConnection urlConnection = null;
         DataOutputStream printout;
+        boolean result = false;
         try {
             String queryParams = "EncounterId=" + encounterId +
                     "&DeviceId=" + 1 +
@@ -153,22 +191,27 @@ public class SyncService extends IntentService {
 
             int status = urlConnection.getResponseCode();
 
-            if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT)
+            if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT){
                 setEncounterPictureSynced(encounterPictureId);
+                result = true;
+            }
             else Log.d(TAG, "uploadEncounterPicture: Error sending encounterPicture, HttpStatus = " + status);
 
         }catch (Exception e){
             e.printStackTrace();
+            result = false;
         }
         finally {
             if(urlConnection != null) urlConnection.disconnect();
         }
+        return result;
     }
 
-    private void uploadEncounter(String encounterId, Encounter encounter){
+    private boolean uploadEncounter(String encounterId, Encounter encounter){
         URL url;
         HttpURLConnection urlConnection = null;
         DataOutputStream printout;
+        boolean result = false;
         try {
             url = new URL(baseApiUrl + "/Encounter");
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -184,6 +227,7 @@ public class SyncService extends IntentService {
             jsonParam.put("LocationCity", encounter.LocationCity);
             jsonParam.put("LocationCountry", encounter.LocationCountry);
             jsonParam.put("LocationLatLong", encounter.LocationLatLong);
+            jsonParam.put("EmailAddress", encounter.EmailAddress);
             jsonParam.put("InsertedTimeStamp", encounter.InsertedTimeStamp);
 
             printout = new DataOutputStream(urlConnection.getOutputStream ());
@@ -193,17 +237,23 @@ public class SyncService extends IntentService {
 
             int status = urlConnection.getResponseCode();
 
-            if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT)
+            if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT){
                 setEncounterSynced(encounterId);
+                result = true;
+            }
+
             else Log.d(TAG, "uploadEncounter: Error sending encounter, HttpStatus = " + status);
 
         }catch (Exception e){
             e.printStackTrace();
+            result = false;
         }
         finally {
             if(urlConnection != null) urlConnection.disconnect();
         }
+        return result;
     }
+
     private void setEncounterSynced(String encounterId){
         ContentValues cv = new ContentValues();
         cv.put(WanderLustDb.EncounterTable.COLUMN_NAME_SYNCED, 1);

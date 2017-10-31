@@ -38,6 +38,12 @@ public class LanguageListAdapter extends ArrayAdapter<LanguageItem> {
         if (it != null) {
             ImageView iv = (ImageView) v.findViewById(R.id.languageImage);
             if (iv != null) {
+
+//                android.view.ViewGroup.LayoutParams layoutParams = iv.getLayoutParams();
+//                layoutParams.width = 400;
+//                layoutParams.height = 400;
+//                iv.setLayoutParams(layoutParams);
+
                 iv.setImageDrawable(it.getImage());
                 iv.setAdjustViewBounds(true);
                 iv.setPadding(10,10,10,10);

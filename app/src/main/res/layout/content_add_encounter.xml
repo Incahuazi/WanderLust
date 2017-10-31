@@ -16,70 +16,71 @@
         android:paddingRight="16dp"
         android:orientation="vertical" >
 
-            <TextView
-                android:id="@+id/textViewAddEncounterFirstStepText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="50px"
-                android:gravity="center"
-                android:lineSpacingExtra="-20sp"
-                android:text="@string/AdddEncounterStep1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textSize="24sp" />
+        <TextView
+            android:id="@+id/textViewAddEncounterFirstStepText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50px"
+            android:gravity="center"
+            android:lineSpacingExtra="-20sp"
+            android:text="@string/AdddEncounterStep1"
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textSize="24sp" />
 
-            <TextView
-                android:id="@+id/textViewAddEncounterAddPicturesText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="80px"
-                android:gravity="center"
-                android:text="@string/AdddEncounterAddPics"/>
+        <TextView
+            android:id="@+id/textViewAddEncounterAddPicturesText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="80px"
+            android:gravity="center"
+            android:text="@string/AdddEncounterAddPics" />
 
             <ImageView
                 android:id="@+id/Pic1"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="100dp"
                 android:background="@drawable/image_border"
                 android:layout_marginBottom="80px"
                 app:srcCompat="@android:drawable/ic_menu_camera"
                 android:scaleType="center"/>
 
-            <ImageView
-                android:id="@+id/Pic2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/image_border"
-                android:layout_marginBottom="80px"
-                app:srcCompat="@android:drawable/ic_menu_camera"
-                android:scaleType="center"/>
+        <ImageView
+            android:id="@+id/Pic2"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="80px"
+            android:background="@drawable/image_border"
+            android:scaleType="center"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
 
-            <ImageView
-                android:id="@+id/Pic3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/image_border"
-                android:layout_marginBottom="80px"
-                app:srcCompat="@android:drawable/ic_menu_camera"
-                android:scaleType="center"/>
+        <ImageView
+            android:id="@+id/Pic3"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="80px"
+            android:background="@drawable/image_border"
+            android:scaleType="center"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
 
-            <TextView
-                android:id="@+id/textViewAddEncounterSecondStepText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="50px"
-                android:gravity="center"
-                android:lineSpacingExtra="-20sp"
-                android:text="@string/AdddEncounterStep2"
-                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                android:textSize="24sp" />
+        <TextView
+            android:id="@+id/textViewAddEncounterSecondStepText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50px"
+            android:gravity="center"
+            android:lineSpacingExtra="-20sp"
+            android:text="@string/AdddEncounterStep2"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textSize="24sp" />
 
-            <TextView
-                android:id="@+id/textViewAddEncounterAddInfoText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="80px"
-                android:gravity="center"
-                android:text="@string/AdddEncounterAddInfoText"/>
+        <TextView
+            android:id="@+id/textViewAddEncounterAddInfoText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="80px"
+            android:gravity="center"
+            android:text="@string/AdddEncounterAddInfoText" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/TextInputNameLayout"
@@ -109,6 +110,22 @@
                     android:hint="Your Message to the world"/>
 
             </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/TextInputEmailLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/TextInputEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:hint="Your email address (optional)"/>
+
+        </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/TextInputLocationCityLayout"
@@ -150,188 +167,9 @@
 
             <Button
                 android:id="@+id/ButtonSaveEncounter"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Save"/>
 
     </LinearLayout>
-
-    <!--<TableLayout-->
-        <!--android:id="@+id/tableLayout"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content">-->
-
-        <!--<TableRow>-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/textViewAddEncounterFirstStepText"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="50px"-->
-                <!--android:gravity="center"-->
-                <!--android:lineSpacingExtra="-20sp"-->
-                <!--android:text="@string/AdddEncounterStep1"-->
-                <!--android:textAppearance="@style/TextAppearance.AppCompat.Display1"-->
-                <!--android:textSize="24sp" />-->
-        <!--</TableRow>-->
-        <!--<TableRow>-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/textViewAddEncounterAddPicturesText"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginBottom="80px"-->
-                <!--android:gravity="center"-->
-                <!--android:text="@string/AdddEncounterAddPics"/>-->
-        <!--</TableRow>-->
-        <!--<TableRow-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<ImageView-->
-                <!--android:id="@+id/Pic1"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="@android:dimen/notification_large_icon_height"-->
-                <!--android:background="@drawable/image_border"-->
-                <!--android:layout_marginBottom="80px"-->
-                <!--app:srcCompat="@android:drawable/ic_menu_camera" />-->
-        <!--</TableRow>-->
-        <!--<TableRow-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<ImageView-->
-                <!--android:id="@+id/Pic2"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="@android:dimen/notification_large_icon_height"-->
-                <!--android:background="@drawable/image_border"-->
-                <!--android:layout_marginBottom="80px"-->
-                <!--app:srcCompat="@android:drawable/ic_menu_camera" />-->
-        <!--</TableRow>-->
-        <!--<TableRow-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<ImageView-->
-                <!--android:id="@+id/Pic3"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="@android:dimen/notification_large_icon_height"-->
-                <!--android:background="@drawable/image_border"-->
-                <!--android:layout_marginBottom="80px"-->
-                <!--app:srcCompat="@android:drawable/ic_menu_camera" />-->
-        <!--</TableRow>-->
-
-        <!--<TableRow>-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/textViewAddEncounterSecondStepText"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="50px"-->
-                <!--android:gravity="center"-->
-                <!--android:lineSpacingExtra="-20sp"-->
-                <!--android:text="@string/AdddEncounterStep2"-->
-                <!--android:textAppearance="@style/TextAppearance.AppCompat.Display1"-->
-                <!--android:textSize="24sp" />-->
-        <!--</TableRow>-->
-
-        <!--<TableRow>-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/textViewAddEncounterAddInfoText"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginBottom="80px"-->
-                <!--android:gravity="center"-->
-                <!--android:text="@string/AdddEncounterAddInfoText"/>-->
-        <!--</TableRow>-->
-
-        <!--<TableRow>-->
-            <!--<android.support.design.widget.TextInputLayout-->
-                <!--android:id="@+id/TextInputNameLayout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content">-->
-
-                <!--<android.support.design.widget.TextInputEditText-->
-                    <!--android:id="@+id/TextInputName"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:hint="Your Name"/>-->
-
-            <!--</android.support.design.widget.TextInputLayout>-->
-        <!--</TableRow>-->
-        <!--<TableRow>-->
-            <!--<android.support.design.widget.TextInputLayout-->
-                <!--android:id="@+id/TextInputMessageLayout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="20dp">-->
-
-                <!--<android.support.design.widget.TextInputEditText-->
-                    <!--android:id="@+id/TextInputMessage"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:hint="Your Message to the world"/>-->
-
-            <!--</android.support.design.widget.TextInputLayout>-->
-        <!--</TableRow>-->
-        <!--<TableRow>-->
-            <!--<android.support.design.widget.TextInputLayout-->
-                <!--android:id="@+id/TextInputLocationCityLayout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="20dp">-->
-
-                <!--<android.support.design.widget.TextInputEditText-->
-                    <!--android:id="@+id/TextInputLocationCity"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:hint="Your Location - City"/>-->
-
-            <!--</android.support.design.widget.TextInputLayout>-->
-        <!--</TableRow>-->
-        <!--<TableRow>-->
-            <!--<android.support.design.widget.TextInputLayout-->
-                <!--android:id="@+id/TextInputLocationCountryLayout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginTop="20dp">-->
-
-                <!--<android.support.design.widget.TextInputEditText-->
-                    <!--android:id="@+id/TextInputLocationCountry"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:hint="Your Location - Country"/>-->
-
-            <!--</android.support.design.widget.TextInputLayout>-->
-        <!--</TableRow>-->
-        <!--<TableRow-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/textView4"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="@string/large_text"/>-->
-        <!--</TableRow>-->
-        <!--<TableRow-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content" >-->
-
-            <!--<Button-->
-                <!--android:id="@+id/ButtonSaveEncounter"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="Save"/>-->
-        <!--</TableRow>-->
-    <!--</TableLayout>-->
 </android.support.v4.widget.NestedScrollView>

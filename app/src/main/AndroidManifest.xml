@@ -58,7 +58,10 @@
             android:name="Sync.SyncService"
             android:exported="false" />
 
-        <activity android:name=".DisplayPictureActivity_readonly"></activity>
+        <activity android:name=".DisplayPictureActivity_readonly" />
+        <activity android:name=".SyncoverviewActivity" />
+        <activity android:name=".ThanksActivity" />
+        <activity android:name=".IdeaActivity"></activity>
     </application>
 
 </manifest>

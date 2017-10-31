@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,12 +45,25 @@ public class ScreenSlidePageFragment extends Fragment {
         pics[2].imageView = (ImageView) rootView.findViewById(R.id.Pic3);
 
         for (int i = 0; i <= 2; i++) {
-            String temp = "Image" + (i+1);
-            pics[i].imagePath = this.getArguments().getString(temp);
-            if (pics[i].imagePath !="")
+            pics[i].imagePath = this.getArguments().getString("Image" + (i+1));
+            if (pics[i].imagePath !=null && !TextUtils.isEmpty(pics[i].imagePath))
             {
-                File picture = new File(pics[i].imagePath);
-                Glide.with(this).load(picture).into(pics[i].imageView);
+                try {
+                    File picture = new File(pics[i].imagePath);
+                    Glide.with(this).load(picture).into(pics[i].imageView);
+
+                    final int item = i;
+                    pics[i].imageView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onClickListener(item);
+                        }
+                    });
+
+                } catch (Exception e) {
+                    //swallow exception on fe corrupt foto
+                    e.printStackTrace();
+                }
             }
             else
             {
@@ -59,16 +73,6 @@ public class ScreenSlidePageFragment extends Fragment {
                 Resources r = getResources();
                 pics[i].imageView.getLayoutParams().height = r.getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
             }
-        }
-
-        for (int i = 0; i <=2 ; i++) {
-            final int item = i;
-            pics[i].imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onClickListener(item);
-                }
-            });
         }
 
         TextView textViewDataName = (TextView) rootView.findViewById(R.id.Name);

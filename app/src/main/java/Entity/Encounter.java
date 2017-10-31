@@ -18,6 +18,7 @@ public class Encounter {
     public String LocationLatLong;
     public EncounterPicture[] encounterPicture = new EncounterPicture[3];
     public String InsertedTimeStamp;
+    public String EmailAddress;
 }
 
 

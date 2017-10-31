@@ -24,13 +24,23 @@ public class LanguageSelectActivity extends ListActivity {
 
         registerReceiver(new NetworkStateChecker(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        LanguageItem[] languageItems = new LanguageItem[3];
+        LanguageItem[] languageItems = new LanguageItem[5];
 
         Drawable foo = ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands, null);
 
-        languageItems[0] = new LanguageItem("nederlands", ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands, null));
-        languageItems[1] = new LanguageItem("English", ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands, null));
-        languageItems[2] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands, null));
+//        languageItems[0] = new LanguageItem("nederlands", ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands, null));
+//        languageItems[1] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.spanish, null));
+//        languageItems[2] = new LanguageItem("English", ResourcesCompat.getDrawable(getResources(), R.drawable.english, null));
+//        languageItems[3] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.french, null));
+//        languageItems[4] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.german, null));
+
+        languageItems[0] = new LanguageItem("nederlands", ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands_round, null));
+        languageItems[1] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.spanish_round, null));
+        languageItems[2] = new LanguageItem("English", ResourcesCompat.getDrawable(getResources(), R.drawable.english_round, null));
+        languageItems[3] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.french_round, null));
+        languageItems[4] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.german_round, null));
+
+
 
         this.adapter = new LanguageListAdapter(this, R.layout.activity_language_select, languageItems);
         this.setListAdapter(adapter);

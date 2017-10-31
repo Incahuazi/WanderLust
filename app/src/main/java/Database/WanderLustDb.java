@@ -24,6 +24,7 @@ public final class WanderLustDb {
         public static final String COLUMN_NAME_LOCATION_LATLONG = "LocationLatLong";
         public static final String COLUMN_NAME_SYNCED = "Synced";
         public static final String COLUMN_NAME_INSERTEDTIMESTAMP = "InsertedTimestamp";
+        public static final String COLUMN_NAME_EMAILADDRESS = "EmailAddress";
     }
 
     public static class EncounterPictureTable implements  BaseColumns{
@@ -43,6 +44,7 @@ public final class WanderLustDb {
                     EncounterTable.COLUMN_NAME_LOCATION_LATLONG + " TEXT," +
                     EncounterTable.COLUMN_NAME_SYNCED + " INTEGER," +
                     EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP + " TEXT, " +
+                    EncounterTable.COLUMN_NAME_EMAILADDRESS + " TEXT, " +
                     EncounterTable.COLUMN_NAME_MESSAGE + " TEXT)"
             ;
 

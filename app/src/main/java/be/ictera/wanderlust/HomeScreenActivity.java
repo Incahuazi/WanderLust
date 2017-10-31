@@ -32,6 +32,22 @@ public class HomeScreenActivity extends AppCompatActivity {
             }
         });
 
+        TableRow viewSynOverviewRow = (TableRow)findViewById(R.id.ViewSynOverviewRow);
+        viewSynOverviewRow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), SyncoverviewActivity.class);
+                startActivity(intent);
+            }
+        });
 
+        TableRow TheIdeaRow = (TableRow)findViewById(R.id.TheIdeaRow);
+        TheIdeaRow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), IdeaActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
