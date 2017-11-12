@@ -12,11 +12,7 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
-    <receiver android:name=".NetworkStateChecker">
-        <intent-filter>
-            <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-        </intent-filter>
-    </receiver>
+
 
     <application
         android:allowBackup="true"
@@ -62,6 +58,12 @@
         <activity android:name=".SyncoverviewActivity" />
         <activity android:name=".ThanksActivity" />
         <activity android:name=".IdeaActivity"></activity>
+
+        <receiver android:name=".NetworkStateChecker">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "be.ictera.wanderlust"
         minSdkVersion 19
@@ -40,4 +39,6 @@ dependencies {
     compile 'com.github.lzyzsd:circleprogress:1.2.1'
     compile 'com.google.code.gson:gson:2.8.2'
     testCompile 'junit:junit:4.12'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc3'
 }

@@ -23,13 +23,11 @@
 
     <include layout="@layout/content_language_select" />
 
-
-
     <ListView
         android:id="@+id/LanguageList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-
+        android:layout_height="match_parent"
+        android:dividerHeight="0dp"
+        android:divider="@null"/>
 
 </android.support.design.widget.CoordinatorLayout>
