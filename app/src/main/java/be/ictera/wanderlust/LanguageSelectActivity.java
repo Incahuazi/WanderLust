@@ -26,17 +26,18 @@ public class LanguageSelectActivity extends ListActivity {
 
         LanguageItem[] languageItems = new LanguageItem[5];
 
-        Drawable foo = ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands, null);
+        int foo =  getResources().getIdentifier("blablabla", "drawable", getPackageName());
 
         languageItems[0] = new LanguageItem("nederlands", ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands_round, null));
-        languageItems[1] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.spanish_round, null));
+        languageItems[1] = new LanguageItem("Spanish", ResourcesCompat.getDrawable(getResources(), R.drawable.spanish_round, null));
         languageItems[2] = new LanguageItem("English", ResourcesCompat.getDrawable(getResources(), R.drawable.english_round, null));
         languageItems[3] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.french_round, null));
-        languageItems[4] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.german_round, null));
+        languageItems[4] = new LanguageItem("German", ResourcesCompat.getDrawable(getResources(), R.drawable.german_round, null));
 
 
 
         this.adapter = new LanguageListAdapter(this, R.layout.activity_language_select, languageItems);
+        this.getListView().setDivider(null);
         this.setListAdapter(adapter);
     }
 

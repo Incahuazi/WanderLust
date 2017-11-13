@@ -9,17 +9,29 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Iterator;
+import java.util.List;
+
 import Database.WanderLustDb;
 import Database.WanderLustDbHelper;
 import Entity.Encounter;
+import SelectLanguage.LanguageItem;
 
 import static java.util.regex.Pattern.quote;
 
@@ -36,7 +48,7 @@ public class SyncService extends IntentService {
     private WanderLustDbHelper dbHelper = null;
     private SQLiteDatabase db = null;
 
-    private static final String Env = "T";
+    private static final String Env = "D";
 
     private static final String baseApiUrl =
         (Env.equals("D"))? "http://192.168.0.235/Wanderlust.WebAPI/api":
@@ -70,6 +82,8 @@ public class SyncService extends IntentService {
                         break;
                     }
                 }
+
+                SyncLanguageResource();
             }
             Log.d(TAG, "Service Stopping!");
         } catch (Exception e){
@@ -79,6 +93,7 @@ public class SyncService extends IntentService {
             if (db!=null)db.close();
         }
     }
+
 
     private boolean IsNetworkConnected(){
         ConnectivityManager cm = (ConnectivityManager) this.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -130,6 +145,167 @@ public class SyncService extends IntentService {
         }
 
         return result;
+    }
+
+    private void SyncLanguageResource() {
+
+        HttpURLConnection urlConnection = null;
+        try {
+            //get the current SyncVersion
+            String getLocalLanguageVersion = "SELECT " +
+                    WanderLustDb.SyncTableVersion.COLUMN_NAME_TableName + "," +
+                    WanderLustDb.SyncTableVersion.COLUMN_NAME_Version + " FROM " +
+                    WanderLustDb.SyncTableVersion.TABLE_NAME + " WHERE " +
+                    WanderLustDb.SyncTableVersion.COLUMN_NAME_TableName + " = '" + WanderLustDb.Language.TABLE_NAME + "'" +
+                    " OR " + WanderLustDb.SyncTableVersion.COLUMN_NAME_TableName + " = '" + WanderLustDb.TextResourceLang.TABLE_NAME + "'";
+
+            Cursor cursor = db.rawQuery(getLocalLanguageVersion, null);
+
+            int localLanguageVersion = 0;
+            int localTextResourceLangVersion = 0;
+            while(cursor.moveToNext()) {
+                if (cursor.getString(0).equals(WanderLustDb.Language.TABLE_NAME)){
+                    localLanguageVersion = cursor.getInt(1);
+                }
+                if (cursor.getString(0).equals(WanderLustDb.TextResourceLang.TABLE_NAME)){
+                    localTextResourceLangVersion = cursor.getInt(1);
+                }
+            }
+
+            //Get the new language from web-api
+            URL url;
+
+            String queryParams = "LocalLanguageVersion=" + localLanguageVersion + "&LocalTextResourceLangVersion=" + localTextResourceLangVersion;
+
+            url = new URL(baseApiUrl + "/Config/LanguageSync?" + queryParams);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+
+            int status = urlConnection.getResponseCode();
+
+            if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT){
+
+                StringBuffer output = new StringBuffer("");
+                InputStream in = urlConnection.getInputStream();
+                BufferedReader buffer = new BufferedReader(new InputStreamReader(in));
+                String resultString = "";
+                while ((resultString = buffer.readLine()) != null)
+                    output.append(resultString);
+
+                HandleLanguageSyncResponse(output.toString());
+            }
+            else Log.d(TAG, "Error retrieving LanguageResource, HttpStatus = " + status);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (urlConnection!=null) urlConnection.disconnect();
+        }
+    }
+
+    private void HandleLanguageSyncResponse(String response){
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        String foo = response;
+        LanguageSyncDTO languageDTO = gson.fromJson(foo, LanguageSyncDTO.class);
+
+        if (!languageDTO.Languages.isEmpty()){UpdateLanguages(languageDTO.Languages);}
+        if (!languageDTO.TextResourceLangsDTO.isEmpty()){UpdateTextResourceLanguages(languageDTO.TextResourceLangsDTO);}
+
+        UpdateLanguageSyncVersions(languageDTO.NewLanguageSyncVersion, languageDTO.NewTextResourceLangVersion);
+    }
+
+    private void UpdateLanguageSyncVersions(int newLanguageSyncVersion, int newTextResourceLangVersion) {
+
+        if (newLanguageSyncVersion>0){
+            String updateSql = "insert or replace into " +
+                    WanderLustDb.SyncTableVersion.TABLE_NAME + "(" + WanderLustDb.SyncTableVersion.COLUMN_NAME_TableName + "," + WanderLustDb.SyncTableVersion.COLUMN_NAME_Version + ")" +
+                    "values('" + WanderLustDb.Language.TABLE_NAME + "'," + newLanguageSyncVersion + ")";
+            db.execSQL(updateSql);
+        }
+
+        if (newTextResourceLangVersion>0){
+            String updateSql = "insert or replace into " +
+                    WanderLustDb.SyncTableVersion.TABLE_NAME + "(" + WanderLustDb.SyncTableVersion.COLUMN_NAME_TableName + "," + WanderLustDb.SyncTableVersion.COLUMN_NAME_Version + ")" +
+                    "values('" + WanderLustDb.TextResourceLang.TABLE_NAME + "'," + newTextResourceLangVersion + ")";
+            db.execSQL(updateSql);
+        }
+
+        String foo = "SELECT " +
+                WanderLustDb.SyncTableVersion.COLUMN_NAME_TableName + "," +
+                WanderLustDb.SyncTableVersion.COLUMN_NAME_Version +
+                " from " + WanderLustDb.SyncTableVersion.TABLE_NAME;
+
+        Cursor cursor = db.rawQuery(foo, null);
+        while (cursor.moveToNext()){
+            String TN = cursor.getString(0);
+            String TV = cursor.getString(1);
+        }
+    }
+
+    private void UpdateTextResourceLanguages(List<TextResourceLangDTO> newTextResourceLanguages){
+        String newValues = "";
+        for (int i = 0; i < newTextResourceLanguages.size();i++){
+
+            newValues += "('" + newTextResourceLanguages.get(i).LanguageCode.trim() + "','" +
+                    newTextResourceLanguages.get(i).TextResourceId + "','" +
+                    newTextResourceLanguages.get(i).Text + "'),";
+        }
+        newValues = newValues.substring(0,newValues.length()-1);
+
+        String updateSql = "insert or replace into " +
+                WanderLustDb.TextResourceLang.TABLE_NAME +
+                "(" + WanderLustDb.TextResourceLang.COLUMN_NAME_LanguageCode +"," +
+                WanderLustDb.TextResourceLang.COLUMN_NAME_TextResourceId +"," +
+                WanderLustDb.TextResourceLang.COLUMN_NAME_Text + ")" +
+                "values " + newValues;
+        db.execSQL(updateSql);
+
+//        String foo = "SELECT " +
+//                WanderLustDb.TextResourceLang.COLUMN_NAME_LanguageCode +"," +
+//                WanderLustDb.TextResourceLang.COLUMN_NAME_TextResourceId +"," +
+//                WanderLustDb.TextResourceLang.COLUMN_NAME_Text + " from " +
+//                WanderLustDb.TextResourceLang.TABLE_NAME;
+//        Cursor cursor = db.rawQuery(foo, null);
+//        while (cursor.moveToNext()){
+//            String LC = cursor.getString(0);
+//            String TRID = cursor.getString(1);
+//            String TXT = cursor.getString(2);
+//        }
+    }
+
+
+    private void UpdateLanguages(List<LanguageDTO> NewLanguages){
+
+        String newValues = "";
+        for (int i = 0; i < NewLanguages.size();i++){
+
+            newValues += "('" + NewLanguages.get(i).LanguageCode.trim() + "','" +
+                    NewLanguages.get(i).LanguageName + "','" +
+                    NewLanguages.get(i).ImageName + "'),";
+        }
+        newValues = newValues.substring(0,newValues.length()-1);
+
+        String updateSql = "insert or replace into " +
+                WanderLustDb.Language.TABLE_NAME +
+                "(" + WanderLustDb.Language.COLUMN_NAME_LanguageCode +"," +
+                WanderLustDb.Language.COLUMN_NAME_LanguageName +"," +
+                WanderLustDb.Language.COLUMN_NAME_ImageName + ")" +
+                "values " + newValues;
+        db.execSQL(updateSql);
+
+//        String foo = "SELECT " +
+//                WanderLustDb.Language.COLUMN_NAME_LanguageCode +"," +
+//                WanderLustDb.Language.COLUMN_NAME_LanguageName +"," +
+//                WanderLustDb.Language.COLUMN_NAME_ImageName + " from " +
+//                WanderLustDb.Language.TABLE_NAME;
+//        Cursor cursor = db.rawQuery(foo, null);
+//        while (cursor.moveToNext()){
+//            String LC = cursor.getString(0);
+//            String LN = cursor.getString(1);
+//            String LI = cursor.getString(2);
+//        }
     }
 
     private boolean SyncEncounterPictures(){

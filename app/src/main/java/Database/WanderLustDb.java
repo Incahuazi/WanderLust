@@ -35,6 +35,26 @@ public final class WanderLustDb {
 
     }
 
+    public static class TextResourceLang {
+        public static final String TABLE_NAME = "TextResourceLang";
+        public static final String COLUMN_NAME_TextResourceId = "TextResourceId";
+        public static final String COLUMN_NAME_LanguageCode = "LanguageCode";
+        public static final String COLUMN_NAME_Text = "Text";
+    }
+
+    public static class Language {
+        public static final String TABLE_NAME = "Language";
+        public static final String COLUMN_NAME_LanguageCode = "LanguageCode";
+        public static final String COLUMN_NAME_LanguageName = "LanguageName";
+        public static final String COLUMN_NAME_ImageName = "ImageName";
+    }
+
+    public static class SyncTableVersion{
+        public static final String TABLE_NAME = "SyncTableVersion";
+        public static final String COLUMN_NAME_TableName = "TableName";
+        public static final String COLUMN_NAME_Version = "Version";
+    }
+
     public static final String SQL_CREATE_ENCOUNTERTABLE =
             "CREATE TABLE " + EncounterTable.TABLE_NAME + " (" +
                     EncounterTable._ID + " TEXT PRIMARY KEY," +
@@ -55,6 +75,31 @@ public final class WanderLustDb {
                     EncounterPictureTable.COLUMN_NAME_IMAGEFILEPATH + " TEXT," +
                     EncounterPictureTable.COLUMN_NAME_SYNCED + " INTEGER)"
             ;
+
+    public static final String SQL_CREATE_TEXTRESOURCELANG =
+            "CREATE TABLE " + TextResourceLang.TABLE_NAME + " (" +
+                    TextResourceLang.COLUMN_NAME_TextResourceId + " TEXT NOT NULL," +
+                    TextResourceLang.COLUMN_NAME_LanguageCode + " TEXT NOT NULL," +
+                    TextResourceLang.COLUMN_NAME_Text + " TEXT," +
+                    "PRIMARY KEY (" + TextResourceLang.COLUMN_NAME_TextResourceId + "," + TextResourceLang.COLUMN_NAME_LanguageCode + "))";
+
+    public static final String SQL_CREATELANGUAGETABLE =
+            "CREATE TABLE " + Language.TABLE_NAME + " (" +
+                    Language.COLUMN_NAME_LanguageCode + " TEXT PRIMARY KEY," +
+                    Language.COLUMN_NAME_ImageName + " TEXT," +
+                    Language.COLUMN_NAME_LanguageName + " TEXT)";
+
+    public static final String SQL_CREATE_SYNCTABLEVERSIONTABLE =
+            "CREATE TABLE " + SyncTableVersion.TABLE_NAME + " (" +
+                    SyncTableVersion.COLUMN_NAME_TableName + " TEXT PRIMARY KEY," +
+                    SyncTableVersion.COLUMN_NAME_Version + " INTEGER)";
+
+    public static final String SQL_INITIALIZE_SYNCTABLEVERSIONTABLE =
+            "INSERT INTO " + SyncTableVersion.TABLE_NAME + "(" +
+                SyncTableVersion.COLUMN_NAME_TableName + ", " +
+                SyncTableVersion.COLUMN_NAME_Version + ")" +
+                "VALUES ('" + Language.TABLE_NAME + "', -1), " +
+                "('" + TextResourceLang.TABLE_NAME + "', -1)";
 }
 
 

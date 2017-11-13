@@ -21,6 +21,10 @@ public class WanderLustDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(WanderLustDb.SQL_CREATE_ENCOUNTERTABLE);
         db.execSQL(WanderLustDb.SQL_CREATE_ENCOUNTERPICTURETABLE);
+        db.execSQL(WanderLustDb.SQL_CREATELANGUAGETABLE);
+        db.execSQL(WanderLustDb.SQL_CREATE_TEXTRESOURCELANG);
+        db.execSQL(WanderLustDb.SQL_CREATE_SYNCTABLEVERSIONTABLE);
+        db.execSQL(WanderLustDb.SQL_INITIALIZE_SYNCTABLEVERSIONTABLE);
     }
 
     @Override
