@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -29,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -41,7 +43,7 @@ import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import Database.WanderLustDb;
@@ -69,12 +71,25 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     private Location location;
     private NetworkStateChecker networkStateChecker = new NetworkStateChecker();
 
+    private WanderLustDbHelper dbHelper = null;
+    private SQLiteDatabase db = null;
+    private String LanguageCode = "ENG";
+
     ImageView[] pics = new ImageView[3];
+    private String ErrorValidationName = "Please enter your name";
+    private String ErrorValidationLocation = "Please enter your location";
+    private String ErrorValidationEmail = "Please enter a valid email address";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_encounter);
+
+        dbHelper = new WanderLustDbHelper(this);
+        db = dbHelper.getReadableDatabase();
+
+        LanguageCode= getIntent().getStringExtra("LanguageCode");
+        ResolveLanguageResource(LanguageCode);
 
         setupHideKeyboard(findViewById(R.id.linearLayout));
 
@@ -196,7 +211,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         ContentValues encounterValues = new ContentValues();
 
         EditText textInputName = (EditText)findViewById(R.id.TextInputName);
-        EditText textInputMessage = (EditText)findViewById(R.id.TextInputMessage);
+        EditText textInputMessage = (EditText)findViewById(R.id.ADDETextInputMessage);
         EditText textInputLocationCity = (EditText)findViewById(R.id.TextInputLocationCity);
         EditText textInputLocationCountry = (EditText)findViewById(R.id.TextInputLocationCountry);
         EditText textInputEmail = (EditText)findViewById(R.id.TextInputEmail);
@@ -208,10 +223,10 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         String strTextInputEmail = textInputEmail.getText().toString();
 
         boolean inputValid;
-        inputValid = validateInput(strTextInputName, "Please enter your name", R.id.TextInputNameLayout);
-        inputValid &= validateInput(strTextInputLocationCity, "Please enter your location", R.id.TextInputLocationCityLayout);
-        inputValid &= validateInput(strTextInputLocationCountry, "Please enter your location", R.id.TextInputLocationCountryLayout);
-        inputValid &= validateInputEmail(strTextInputEmail, "Please enter a valid email address", R.id.TextInputEmailLayout);
+        inputValid = validateInput(strTextInputName, this.ErrorValidationName, R.id.TextInputNameLayout);
+        inputValid &= validateInput(strTextInputLocationCity, this.ErrorValidationLocation, R.id.TextInputLocationCityLayout);
+        inputValid &= validateInput(strTextInputLocationCountry, this.ErrorValidationLocation, R.id.TextInputLocationCountryLayout);
+        inputValid &= validateInputEmail(strTextInputEmail, this.ErrorValidationEmail, R.id.TextInputEmailLayout);
 
 
         if (!inputValid){
@@ -258,6 +273,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         }
         networkStateChecker.tryToSync(this);
         Intent i = new Intent(getApplicationContext(), ThanksActivity.class);
+        i.putExtra("LanguageCode", LanguageCode);
         this.finish();
         startActivity(i);
     }
@@ -433,5 +449,86 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
                 setupHideKeyboard(innerView);
             }
         }
+    }
+
+
+    private void ResolveLanguageResource(String languageCode) {
+        Map<String, String> resLang = dbHelper.GetAllTextResouceForActivityAndLanguage("AddEncounterActivity", languageCode, db);
+
+        if (resLang.containsKey("ADDEErrorName")) {
+            this.ErrorValidationName = resLang.get("ADDEErrorName");
+        }
+
+        if (resLang.containsKey("ADDEErrorLocation")) {
+            this.ErrorValidationLocation = resLang.get("ADDEErrorLocation");
+        }
+
+        if (resLang.containsKey("ADDEErrorEmail")) {
+            this.ErrorValidationEmail = resLang.get("ADDEErrorEmail");
+        }
+
+        if (resLang.containsKey("ADDEStep1")) {
+            TextView textView = (TextView)findViewById(R.id.ADDEStep1);
+            textView.setText(resLang.get("ADDEStep1"));
+        }
+
+        if (resLang.containsKey("ADDEStep1SubText")) {
+            TextView textView = (TextView)findViewById(R.id.ADDEStep1SubText);
+            textView.setText(resLang.get("ADDEStep1SubText"));
+        }
+
+        if (resLang.containsKey("ADDEStep2")) {
+            TextView textView = (TextView)findViewById(R.id.ADDEStep2);
+            textView.setText(resLang.get("ADDEStep2"));
+        }
+
+        if (resLang.containsKey("ADDEMoreInfo")) {
+            TextView textView = (TextView)findViewById(R.id.ADDEMoreInfo);
+            textView.setText(resLang.get("ADDEMoreInfo"));
+        }
+
+        if (resLang.containsKey("ADDETitle")) {
+            this.setTitle(resLang.get("ADDETitle"));
+        }
+
+        if (resLang.containsKey("ADDETextInputName")) {
+            TextInputLayout textView = (TextInputLayout)findViewById(R.id.TextInputNameLayout);
+            textView.setHint (resLang.get("ADDETextInputName"));
+        }
+
+        if (resLang.containsKey("ADDETextInputMessage")) {
+            TextInputLayout textView = (TextInputLayout)findViewById(R.id.TextInputMessageLayout);
+            textView.setHint (resLang.get("ADDETextInputMessage"));
+        }
+
+        if (resLang.containsKey("ADDETextInputEmail")) {
+            TextInputLayout textView = (TextInputLayout)findViewById(R.id.TextInputEmailLayout);
+            textView.setHint (resLang.get("ADDETextInputEmail"));
+        }
+
+        if (resLang.containsKey("ADDEInputLocationCity")) {
+            TextInputLayout textView = (TextInputLayout)findViewById(R.id.TextInputLocationCityLayout);
+            textView.setHint (resLang.get("ADDEInputLocationCity"));
+        }
+
+        if (resLang.containsKey("ADDEInputLocationCountry")) {
+            TextInputLayout textView = (TextInputLayout)findViewById(R.id.TextInputLocationCountryLayout);
+            textView.setHint (resLang.get("ADDEInputLocationCountry"));
+        }
+
+        if (resLang.containsKey("ADDEButtonSave")) {
+            Button buttonSave = (Button)findViewById(R.id.ButtonSaveEncounter);
+            buttonSave.setText (resLang.get("ADDEButtonSave"));
+        }
+//
+//        if (resLang.containsKey("TIDStep3Header")) {
+//            TextView textView = (TextView)findViewById(R.id.TIDStep3Header);
+//            textView.setText(resLang.get("TIDStep3Header"));
+//        }
+//
+//        if (resLang.containsKey("TIDTitle")) {
+//            TextView textView = (TextView)findViewById(R.id.TIDTitle);
+//            textView.setText(resLang.get("TIDTitle"));
+//        }
     }
 }

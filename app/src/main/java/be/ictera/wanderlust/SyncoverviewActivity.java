@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.github.lzyzsd.circleprogress.DonutProgress;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -28,7 +29,11 @@ public class SyncoverviewActivity extends AppCompatActivity {
     private Timer Encountertimer;
     private Timer Picturetimer;
     private static WanderLustDbHelper dbHelper = null;
-    private SQLiteDatabase db = null;
+
+    private String LanguageCode = "ENG";
+    private String strNoSyncNeeded = "No synchronization needed";
+    private String strSynced = "Synced";
+    private String strProgress = "progress";
 
     private static int countertester = 20;
 
@@ -42,6 +47,10 @@ public class SyncoverviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_syncoverview);
 
         dbHelper =  new WanderLustDbHelper(this);
+        LanguageCode= getIntent().getStringExtra("LanguageCode");
+
+
+        ResolveLanguageResource(LanguageCode);
 
         donutEncounterProgress = (MyDonutProgress) findViewById(R.id.donut_progress_encounters);
         donutPictureProgress = (MyDonutProgress) findViewById(R.id.donut_progress_pictures);
@@ -57,13 +66,13 @@ public class SyncoverviewActivity extends AppCompatActivity {
             case Encounter:
                 //check if other sync is also 0
                 if(returnNrOfUnsyncedPictures()==0){
-                    textViewheader.setText("No synchronization needed");
+                    textViewheader.setText(strNoSyncNeeded);
                 }
                 break;
             case Pictures:
                 //check if other sync is also 0
                 if(returnNrOfUnsyncedEncounters()==0){
-                    textViewheader.setText("No synchronization needed");
+                    textViewheader.setText(strNoSyncNeeded);
                 }
                 break;
         }
@@ -75,7 +84,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
         if (nrOfUnsyncedEncounters==0){
             donutEncounterProgress.setSuffixText("");
             donutEncounterProgress.setProgress(100);
-            donutEncounterProgress.setText("Synced");
+            donutEncounterProgress.setText(strSynced);
             HandleHeaderTextOnCounterZero(CounterType.Encounter);
         }
         else{
@@ -95,7 +104,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
                             int currentNrOfUnsyncedEncounters = returnNrOfUnsyncedEncounters();
                             if (donutEncounterProgress.getProgress()!=currentNrOfUnsyncedEncounters){
                                 //update the progress bar
-                                ObjectAnimator anim = ObjectAnimator.ofInt(donutEncounterProgress, "progress", donutEncounterProgress.getProgress(), donutEncounterProgress.getMax() - currentNrOfUnsyncedEncounters);
+                                ObjectAnimator anim = ObjectAnimator.ofInt(donutEncounterProgress, strProgress, donutEncounterProgress.getProgress(), donutEncounterProgress.getMax() - currentNrOfUnsyncedEncounters);
                                 anim.setInterpolator(new DecelerateInterpolator());
                                 anim.setDuration(500);
                                 anim.start();
@@ -103,7 +112,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
                             if (currentNrOfUnsyncedEncounters==0) {
                                 Encountertimer.cancel();
                                 donutEncounterProgress.setProgress(donutEncounterProgress.getMax());
-                                donutEncounterProgress.setText("Synced");
+                                donutEncounterProgress.setText(strSynced);
                                 HandleHeaderTextOnCounterZero(CounterType.Encounter);
                             }
                         }
@@ -119,7 +128,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
         if (nrOfUnsyncedPictures==0){
             donutPictureProgress.setSuffixText("");
             donutPictureProgress.setProgress(100);
-            donutPictureProgress.setText("Synced");
+            donutPictureProgress.setText(strSynced);
             HandleHeaderTextOnCounterZero(CounterType.Pictures);
         }
         else{
@@ -139,7 +148,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
                             int currentNrOfUnsyncedPictures = returnNrOfUnsyncedPictures();
                             if (donutPictureProgress.getProgress()!=currentNrOfUnsyncedPictures){
                                 //update the progress bar
-                                ObjectAnimator anim = ObjectAnimator.ofInt(donutPictureProgress, "progress", donutPictureProgress.getProgress(), donutPictureProgress.getMax() - currentNrOfUnsyncedPictures);
+                                ObjectAnimator anim = ObjectAnimator.ofInt(donutPictureProgress, strProgress, donutPictureProgress.getProgress(), donutPictureProgress.getMax() - currentNrOfUnsyncedPictures);
                                 anim.setInterpolator(new DecelerateInterpolator());
                                 anim.setDuration(500);
                                 anim.start();
@@ -147,7 +156,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
                             if (currentNrOfUnsyncedPictures==0) {
                                 Picturetimer.cancel();
                                 donutPictureProgress.setProgress(donutPictureProgress.getMax());
-                                donutPictureProgress.setText("Synced");
+                                donutPictureProgress.setText(strSynced);
                                 HandleHeaderTextOnCounterZero(CounterType.Pictures);
                             }
                         }
@@ -161,7 +170,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
 //            this.countertester--;
 //            if (this.countertester<0) this.countertester = 0;
 //            return this.countertester;
-
+        SQLiteDatabase db = null;
         try{
             db = dbHelper.getReadableDatabase();
             String unSyncedPicturesQuery =
@@ -183,7 +192,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
 //        this.countertester--;
 //        if (this.countertester<0) this.countertester = 0;
 //        return this.countertester;
-
+        SQLiteDatabase db = null;
         try{
             db = dbHelper.getReadableDatabase();
             String unSyncedEncountersQuery =
@@ -200,4 +209,32 @@ public class SyncoverviewActivity extends AppCompatActivity {
         }
         return -1;
     }
+
+    private void ResolveLanguageResource(String languageCode) {
+        SQLiteDatabase db = null;
+        try {
+            db = dbHelper.getReadableDatabase();
+            Map<String, String> resLang = dbHelper.GetAllTextResouceForActivityAndLanguage("SyncoverviewActivity", languageCode, db);
+
+            if (resLang.containsKey("SONoSyncNeeded")) {
+                strNoSyncNeeded = resLang.get("SONoSyncNeeded");
+            }
+
+            if (resLang.containsKey("SOSynced")) {
+                strSynced = resLang.get("SOSynced");
+            }
+
+            if (resLang.containsKey("SOProgress")) {
+                strProgress = resLang.get("SOProgress");
+            }
+
+        } catch (Exception e) {
+        Log.d(TAG, "could not get language resources from db" + e.getMessage());
+
+        } finally{
+            if (db!=null)db.close();
+        }
+
+    }
+
 }

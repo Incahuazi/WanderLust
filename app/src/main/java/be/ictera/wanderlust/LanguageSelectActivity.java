@@ -3,6 +3,7 @@ package be.ictera.wanderlust;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -10,6 +11,10 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.view.View;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Map;
+
+import Database.WanderLustDbHelper;
 import SelectLanguage.LanguageItem;
 import SelectLanguage.LanguageListAdapter;
 import Sync.NetworkStateChecker;
@@ -17,6 +22,9 @@ import Sync.NetworkStateChecker;
 public class LanguageSelectActivity extends ListActivity {
 
     private LanguageListAdapter adapter;
+    private WanderLustDbHelper dbHelper = null;
+    private SQLiteDatabase db = null;
+    private LanguageItem[] languageItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +32,39 @@ public class LanguageSelectActivity extends ListActivity {
 
         registerReceiver(new NetworkStateChecker(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
-        LanguageItem[] languageItems = new LanguageItem[5];
+        dbHelper = new WanderLustDbHelper(this);
+        db = dbHelper.getReadableDatabase();
 
-        int foo =  getResources().getIdentifier("blablabla", "drawable", getPackageName());
+        ArrayList<String[]> languages = dbHelper.GetAllLanguages(db);
 
-        languageItems[0] = new LanguageItem("nederlands", ResourcesCompat.getDrawable(getResources(), R.drawable.nederlands_round, null));
-        languageItems[1] = new LanguageItem("Spanish", ResourcesCompat.getDrawable(getResources(), R.drawable.spanish_round, null));
-        languageItems[2] = new LanguageItem("English", ResourcesCompat.getDrawable(getResources(), R.drawable.english_round, null));
-        languageItems[3] = new LanguageItem("Francais", ResourcesCompat.getDrawable(getResources(), R.drawable.french_round, null));
-        languageItems[4] = new LanguageItem("German", ResourcesCompat.getDrawable(getResources(), R.drawable.german_round, null));
+        languageItems = new LanguageItem[languages.size()];
 
+        int languageCounter = 0;
+        int colorSwitcher = 1;
+        for (String[] item : languages) {
 
+            if (item[2] != null && !item[2].isEmpty() && !item[2].equalsIgnoreCase("null")) {
+                int resourceId = getResources().getIdentifier(item[2], "drawable", getPackageName());
+                languageItems[languageCounter] = new LanguageItem(item[1], ResourcesCompat.getDrawable(getResources(), resourceId, null), false, item[0]);
+            } else {
+                Drawable drawable;
+                switch (colorSwitcher) {
+                    case 1:
+                        languageItems[languageCounter] = new LanguageItem(item[1], ResourcesCompat.getDrawable(getResources(), R.drawable.blank_blue, null), true, item[0]);
+                        colorSwitcher++;
+                        break;
+                    case 2:
+                        languageItems[languageCounter] = new LanguageItem(item[1], ResourcesCompat.getDrawable(getResources(), R.drawable.blank_orange, null), true, item[0]);
+                        colorSwitcher++;
+                        break;
+                    case 3:
+                        languageItems[languageCounter] = new LanguageItem(item[1], ResourcesCompat.getDrawable(getResources(), R.drawable.blank_green, null), true, item[0]);
+                        colorSwitcher = 1;
+                        break;
+                }
+            }
+            languageCounter++;
+        }
 
         this.adapter = new LanguageListAdapter(this, R.layout.activity_language_select, languageItems);
         this.getListView().setDivider(null);
@@ -43,17 +73,9 @@ public class LanguageSelectActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-//        this.adapter.getItem(position).click(this.getApplicationContext());
         LanguageItem foo = this.adapter.getItem(position);
-//        Intent intent = new Intent(this, AddEncounterActivity.class);
-//        Intent intent = new Intent(this, personListActivity.class);
-
-//        Intent intent = new Intent(this, ShowEncounterScreenSlidePagerActivity.class);
-
-        Intent intent = new Intent(this,HomeScreenActivity.class);
-
+        Intent intent = new Intent(this, HomeScreenActivity.class);
+        intent.putExtra("LanguageCode", languageItems[position].LanguageCode);
         startActivity(intent);
-
-
     }
 }

@@ -33,6 +33,7 @@ import Database.WanderLustDbHelper;
 import Entity.Encounter;
 import SelectLanguage.LanguageItem;
 
+import static android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE;
 import static java.util.regex.Pattern.quote;
 
 
@@ -246,21 +247,35 @@ public class SyncService extends IntentService {
 
     private void UpdateTextResourceLanguages(List<TextResourceLangDTO> newTextResourceLanguages){
         String newValues = "";
+        ContentValues cv = new ContentValues();
+
         for (int i = 0; i < newTextResourceLanguages.size();i++){
 
-            newValues += "('" + newTextResourceLanguages.get(i).LanguageCode.trim() + "','" +
-                    newTextResourceLanguages.get(i).TextResourceId + "','" +
-                    newTextResourceLanguages.get(i).Text + "'),";
-        }
-        newValues = newValues.substring(0,newValues.length()-1);
+            cv.put(WanderLustDb.TextResourceLang.COLUMN_NAME_LanguageCode, newTextResourceLanguages.get(i).LanguageCode.trim());
+            cv.put(WanderLustDb.TextResourceLang.COLUMN_NAME_TextResourceId, newTextResourceLanguages.get(i).TextResourceId);
+            cv.put(WanderLustDb.TextResourceLang.COLUMN_NAME_ActivityName, newTextResourceLanguages.get(i).ActivityName);
+            cv.put(WanderLustDb.TextResourceLang.COLUMN_NAME_Text, newTextResourceLanguages.get(i).Text);
 
-        String updateSql = "insert or replace into " +
-                WanderLustDb.TextResourceLang.TABLE_NAME +
-                "(" + WanderLustDb.TextResourceLang.COLUMN_NAME_LanguageCode +"," +
-                WanderLustDb.TextResourceLang.COLUMN_NAME_TextResourceId +"," +
-                WanderLustDb.TextResourceLang.COLUMN_NAME_Text + ")" +
-                "values " + newValues;
-        db.execSQL(updateSql);
+            db.insertWithOnConflict(WanderLustDb.TextResourceLang.TABLE_NAME,null ,cv, CONFLICT_REPLACE);
+
+
+//            newValues += "('" + newTextResourceLanguages.get(i).LanguageCode.trim() + "','" +
+//                    newTextResourceLanguages.get(i).TextResourceId + "','" +
+//                    newTextResourceLanguages.get(i).ActivityName + "','" +
+//                    newTextResourceLanguages.get(i).Text.replaceAll("'","''") + "'),";
+        }
+//        newValues = newValues.substring(0,newValues.length()-1);
+
+//        String updateSql = "insert or replace into " +
+//                WanderLustDb.TextResourceLang.TABLE_NAME +
+//                "(" + WanderLustDb.TextResourceLang.COLUMN_NAME_LanguageCode +"," +
+//                WanderLustDb.TextResourceLang.COLUMN_NAME_TextResourceId +"," +
+//                WanderLustDb.TextResourceLang.COLUMN_NAME_ActivityName +"," +
+//                WanderLustDb.TextResourceLang.COLUMN_NAME_Text + ")" +
+//                "values " + newValues;
+
+
+//        db.execSQL(updateSql);
 
 //        String foo = "SELECT " +
 //                WanderLustDb.TextResourceLang.COLUMN_NAME_LanguageCode +"," +

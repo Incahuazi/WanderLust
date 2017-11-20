@@ -17,7 +17,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/textViewAddEncounterFirstStepText"
+            android:id="@+id/ADDEStep1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50px"
@@ -29,7 +29,7 @@
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/textViewAddEncounterAddPicturesText"
+            android:id="@+id/ADDEStep1SubText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="80px"
@@ -64,7 +64,7 @@
             app:srcCompat="@android:drawable/ic_menu_camera" />
 
         <TextView
-            android:id="@+id/textViewAddEncounterSecondStepText"
+            android:id="@+id/ADDEStep2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="50px"
@@ -75,7 +75,7 @@
             android:textSize="24sp" />
 
         <TextView
-            android:id="@+id/textViewAddEncounterAddInfoText"
+            android:id="@+id/ADDEMoreInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="80px"
@@ -103,11 +103,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp">
 
+                <!--<android.support.design.widget.TextInputEditText-->
+                    <!--android:id="@+id/ADDETextInputMessage"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:hint="Your Message to the world"-->
+                    <!--/>-->
                 <android.support.design.widget.TextInputEditText
-                    android:id="@+id/TextInputMessage"
+                    android:id="@+id/ADDETextInputMessage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Your Message to the world"/>
+                    />
 
             </android.support.design.widget.TextInputLayout>
 

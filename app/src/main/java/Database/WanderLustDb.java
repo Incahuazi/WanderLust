@@ -40,6 +40,7 @@ public final class WanderLustDb {
         public static final String COLUMN_NAME_TextResourceId = "TextResourceId";
         public static final String COLUMN_NAME_LanguageCode = "LanguageCode";
         public static final String COLUMN_NAME_Text = "Text";
+        public static final String COLUMN_NAME_ActivityName = "ActivityName";
     }
 
     public static class Language {
@@ -81,6 +82,7 @@ public final class WanderLustDb {
                     TextResourceLang.COLUMN_NAME_TextResourceId + " TEXT NOT NULL," +
                     TextResourceLang.COLUMN_NAME_LanguageCode + " TEXT NOT NULL," +
                     TextResourceLang.COLUMN_NAME_Text + " TEXT," +
+                    TextResourceLang.COLUMN_NAME_ActivityName + " TEXT," +
                     "PRIMARY KEY (" + TextResourceLang.COLUMN_NAME_TextResourceId + "," + TextResourceLang.COLUMN_NAME_LanguageCode + "))";
 
     public static final String SQL_CREATELANGUAGETABLE =
