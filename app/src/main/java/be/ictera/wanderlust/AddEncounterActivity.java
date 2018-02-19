@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -50,6 +52,7 @@ import Database.WanderLustDb;
 import Database.WanderLustDbHelper;
 import Entity.Encounter;
 import Entity.EncounterPicture;
+import Helper.GlideApp;
 import Helper.helper;
 import Sync.NetworkStateChecker;
 
@@ -75,10 +78,11 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     private SQLiteDatabase db = null;
     private String LanguageCode = "ENG";
 
-    ImageView[] pics = new ImageView[3];
+    ImageView[] pics = new ImageView[4];
     private String ErrorValidationName = "Please enter your name";
     private String ErrorValidationLocation = "Please enter your location";
     private String ErrorValidationEmail = "Please enter a valid email address";
+    private String ErrorTakeProfilePicture = "PLease take a profile picture";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,8 +109,10 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         this.pics[0] = (ImageView)findViewById(R.id.Pic1);
         this.pics[1] = (ImageView)findViewById(R.id.Pic2);
         this.pics[2] = (ImageView)findViewById(R.id.Pic3);
+        this.pics[3] = (ImageView)findViewById(R.id.Pic4);
 
-        for (int i = 0; i <3 ; i++) {
+
+        for (int i = 0; i <4 ; i++) {
             final int item = i;
             pics[i].setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -123,7 +129,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
                 if (encounter.encounterPicture[i] !=null){
                     String imageFilePath = encounter.encounterPicture[i].imageFilePath;
                     if (imageFilePath !=null && !TextUtils.isEmpty(imageFilePath)){
-                        setPic(pics[i], encounter.encounterPicture[i].imageFilePath);
+                        setPic(pics[i], encounter.encounterPicture[i].imageFilePath, i==0);
                     }
                 }
             }
@@ -246,6 +252,17 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_INSERTEDTIMESTAMP, GetUTCdatetimeAsString());
         encounterValues.put(WanderLustDb.EncounterTable.COLUMN_NAME_EMAILADDRESS, strTextInputEmail);
 
+        //check if there is at least a profile picture
+        //this is picture with id 0
+
+        if (this.encounter.encounterPicture[0] == null || !TextUtils.isEmpty(this.encounter.encounterPicture[0].imageFilePath)){
+            Toast myToast = Toast.makeText(this, ErrorTakeProfilePicture, Toast.LENGTH_LONG);
+            myToast.setGravity(Gravity.CENTER,0,0);
+            myToast.show();
+            return;
+        }
+
+
         db.beginTransaction();
         try {
             db.insert(WanderLustDb.EncounterTable.TABLE_NAME, null, encounterValues);
@@ -335,7 +352,7 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK){
-                setPic(pics[currentPicture], encounter.encounterPicture[currentPicture].imageFilePath);
+                setPic(pics[currentPicture], encounter.encounterPicture[currentPicture].imageFilePath, currentPicture==0);
             }
             else{
                 File imageFile = new File(this.encounter.encounterPicture[currentPicture].imageFilePath);
@@ -367,9 +384,24 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         }
     }
 
-    private void setPic(ImageView mImageView, String imageFilePath) {
+    private void setPic(ImageView mImageView, String imageFilePath, boolean circular) {
         File picture = new File(imageFilePath);
-        Glide.with(this).load(picture).into(mImageView);
+//        Glide.with(this).load(picture).into(mImageView);
+
+        if (circular){
+            GlideApp.with(this)
+                    .load(picture)
+                    .fitCenter()
+                    .apply(RequestOptions.circleCropTransform())
+                    //.centerCrop()
+                    .into(mImageView);
+        } else {
+            GlideApp.with(this)
+                    .load(picture)
+                    //.centerCrop()
+                    //.fitCenter()
+                    .into(mImageView);
+        }
 
         ExifInterface exif = null;
         try {
@@ -477,6 +509,11 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
             textView.setText(resLang.get("ADDEStep1SubText"));
         }
 
+        if (resLang.containsKey("ADDEStep1MorePics")) {
+            TextView textView = (TextView)findViewById(R.id.ADDEStep1MorePics);
+            textView.setText(resLang.get("ADDEStep1MorePics"));
+        }
+
         if (resLang.containsKey("ADDEStep2")) {
             TextView textView = (TextView)findViewById(R.id.ADDEStep2);
             textView.setText(resLang.get("ADDEStep2"));
@@ -520,6 +557,12 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
             Button buttonSave = (Button)findViewById(R.id.ButtonSaveEncounter);
             buttonSave.setText (resLang.get("ADDEButtonSave"));
         }
+
+        if (resLang.containsKey("ADDEErrorAddProfilePic")) {
+            ErrorTakeProfilePicture = resLang.get("ADDEErrorAddProfilePic");
+        }
+
+
 //
 //        if (resLang.containsKey("TIDStep3Header")) {
 //            TextView textView = (TextView)findViewById(R.id.TIDStep3Header);

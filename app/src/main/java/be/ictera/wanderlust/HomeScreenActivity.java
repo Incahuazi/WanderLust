@@ -1,10 +1,17 @@
 package be.ictera.wanderlust;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,11 +20,20 @@ import java.util.Map;
 
 import Database.WanderLustDbHelper;
 
+
 public class HomeScreenActivity extends AppCompatActivity {
 
     private WanderLustDbHelper dbHelper = null;
     private SQLiteDatabase db = null;
     private String LanguageCode = "ENG";
+
+    private String HSSyncHeaderAskSync = "";
+    private String HSSyncTextAskSync = "";
+    private String HSSyncHeader = "";
+    private String HSSyncText = "";
+
+    private ColorStateList oldSyncHeaderColor;
+    private ColorStateList oldSyncTextColor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +44,12 @@ public class HomeScreenActivity extends AppCompatActivity {
         db = dbHelper.getReadableDatabase();
 
 
+        //Save old sync text color
+        TextView HHSyncHeaderTextView = (TextView)findViewById(R.id.HSSyncHeader);
+        TextView HSSyncTextTextView = (TextView)findViewById(R.id.HSSyncText);
+        oldSyncHeaderColor =  HHSyncHeaderTextView.getTextColors(); //save original colors
+        oldSyncTextColor =  HSSyncTextTextView.getTextColors(); //save original colors
+
         LanguageCode= getIntent().getStringExtra("LanguageCode");
         ResolveLanguageResource(LanguageCode);
 
@@ -35,8 +57,8 @@ public class HomeScreenActivity extends AppCompatActivity {
         addEncounterTableRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getApplicationContext(), AddEncounterActivity.class);
-                Intent intent = new Intent(getApplicationContext(), ThanksActivity.class);
+                Intent intent = new Intent(getApplicationContext(), AddEncounterActivity.class);
+//                Intent intent = new Intent(getApplicationContext(), ThanksActivity.class);
                 intent.putExtra("LanguageCode", LanguageCode);
                 startActivity(intent);
             }
@@ -70,6 +92,56 @@ public class HomeScreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        handleSyncText();
+    }
+
+    private void showAskForSyncToast(String text, int duration){
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.askforsync_toast,
+                (ViewGroup) findViewById(R.id.AskForSync_toast_layout_root));
+
+        ImageView image = (ImageView) layout.findViewById(R.id.AskForSync_image);
+        image.setImageResource(R.drawable.mycloud);
+        TextView textView = (TextView) layout.findViewById(R.id.AskForSync_text);
+        textView.setText(text);
+        textView.setTextSize(18);
+
+        Toast toast = new Toast(getApplicationContext());
+        toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+        toast.setDuration(duration);
+        toast.setView(layout);
+        toast.show();
+    }
+
+    private void handleSyncText(){
+        boolean unsyncedData = dbHelper.dbHasUnsyncedData(db);
+
+        TextView HHSyncHeaderTextView = (TextView)findViewById(R.id.HSSyncHeader);
+        TextView HSSyncTextTextView = (TextView)findViewById(R.id.HSSyncText);
+
+        if (unsyncedData){
+            //set color red
+            HHSyncHeaderTextView.setTextColor(Color.parseColor("#f45f42"));
+            HSSyncTextTextView.setTextColor(Color.parseColor("#f45f42"));
+            HHSyncHeaderTextView.setTypeface(null, Typeface.BOLD);
+
+            HHSyncHeaderTextView.setText(HSSyncHeaderAskSync);
+            HSSyncTextTextView.setText(HSSyncTextAskSync);
+
+            showAskForSyncToast(HSSyncTextAskSync,Toast.LENGTH_LONG);
+        }
+        else {
+            HHSyncHeaderTextView.setText(HSSyncHeader);
+            HSSyncTextTextView.setText(HSSyncText);
+            HHSyncHeaderTextView.setTextColor(oldSyncHeaderColor);
+            HSSyncTextTextView.setTextColor(oldSyncTextColor);
+            HHSyncHeaderTextView.setTypeface(null, Typeface.NORMAL);
+        }
     }
 
     private void ResolveLanguageResource(String languageCode) {
@@ -115,14 +187,34 @@ public class HomeScreenActivity extends AppCompatActivity {
             HomeScreenTitleTextView.setText(resLang.get("HSHistoryText"));
         }
 
-        if (resLang.containsKey("HSSyncHeader")) {
-            TextView HomeScreenTitleTextView = (TextView)findViewById(R.id.HSSyncHeader);
-            HomeScreenTitleTextView.setText(resLang.get("HSSyncHeader"));
+
+        if (resLang.containsKey("HSSyncHeaderAskSync")){
+            HSSyncHeaderAskSync = resLang.get("HSSyncHeaderAskSync");
+        }
+        else {
+            HSSyncHeaderAskSync = "Synchronize";
         }
 
-        if (resLang.containsKey("HSSyncText")) {
-            TextView HomeScreenTitleTextView = (TextView)findViewById(R.id.HSSyncText);
-            HomeScreenTitleTextView.setText(resLang.get("HSSyncText"));
+        if (resLang.containsKey("HSSyncTextAskSync")){
+            HSSyncTextAskSync = resLang.get("HSSyncTextAskSync");
         }
+        else {
+            HSSyncTextAskSync = "Please Synchronize with website";
+        }
+
+        if (resLang.containsKey("HSSyncHeader")){
+            HSSyncHeader = resLang.get("HSSyncHeader");
+        }
+        else {
+            HSSyncHeader = "Synchronize";
+        }
+
+        if (resLang.containsKey("HSSyncText")){
+            HSSyncText = resLang.get("HSSyncText");
+        }
+        else {
+            HSSyncText = "Synchronize with website";
+        }
+        handleSyncText();
     }
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 public class WanderLustDbHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "WanderLust.db";
+    public static final String DATABASE_NAME = "WanderLustf.db";
 
     public WanderLustDbHelper(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -78,5 +78,25 @@ public class WanderLustDbHelper extends SQLiteOpenHelper {
             result.add(strArray);
         }
         return result;
+    }
+
+    public boolean dbHasUnsyncedData (SQLiteDatabase db){
+        String sqlQuery =  "SELECT " + WanderLustDb.EncounterTable._ID +
+                                " FROM " + WanderLustDb.EncounterTable.TABLE_NAME +
+                                " WHERE " + WanderLustDb.EncounterTable.COLUMN_NAME_SYNCED + " <> 1" +
+                            " UNION ALL " +
+                            "SELECT " + WanderLustDb.EncounterPictureTable._ID +
+                                " FROM " + WanderLustDb.EncounterPictureTable.TABLE_NAME +
+                                " WHERE " + WanderLustDb.EncounterPictureTable.COLUMN_NAME_SYNCED + " <> 1";
+
+        Cursor cursor = db.rawQuery(sqlQuery, null);
+        if(cursor.getCount() <= 0){
+            cursor.close();
+            return false;
+        }
+        else{
+            cursor.close();
+            return true;
+        }
     }
 }

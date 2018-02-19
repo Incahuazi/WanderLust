@@ -34,16 +34,24 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="80px"
             android:gravity="center"
-            android:text="@string/AdddEncounterAddPics" />
+            android:text="Add a profile picture" />
 
-            <ImageView
-                android:id="@+id/Pic1"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@drawable/image_border"
-                android:layout_marginBottom="80px"
-                app:srcCompat="@android:drawable/ic_menu_camera"
-                android:scaleType="center"/>
+        <ImageView
+            android:id="@+id/Pic1"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/image_border"
+            android:layout_marginBottom="80px"
+            app:srcCompat="@android:drawable/ic_menu_camera"
+            android:scaleType="center"/>
+
+        <TextView
+            android:id="@+id/ADDEStep1MorePics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="80px"
+            android:gravity="center"
+            android:text="Add some nice pictures" />
 
         <ImageView
             android:id="@+id/Pic2"
@@ -56,6 +64,15 @@
 
         <ImageView
             android:id="@+id/Pic3"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginBottom="80px"
+            android:background="@drawable/image_border"
+            android:scaleType="center"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
+
+        <ImageView
+            android:id="@+id/Pic4"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginBottom="80px"
@@ -113,6 +130,7 @@
                     android:id="@+id/ADDETextInputMessage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Your Message to the world"
                     />
 
             </android.support.design.widget.TextInputLayout>

@@ -49,7 +49,7 @@ public class SyncService extends IntentService {
     private WanderLustDbHelper dbHelper = null;
     private SQLiteDatabase db = null;
 
-    private static final String Env = "D";
+    private static final String Env = "T";
 
     private static final String baseApiUrl =
         (Env.equals("D"))? "http://192.168.0.235/Wanderlust.WebAPI/api":

@@ -47,7 +47,9 @@ public class LanguageListAdapter extends ArrayAdapter<LanguageItem> {
 
                     iv.setImageDrawable(it.getImage());
                     iv.setAdjustViewBounds(true);
-                    iv.setPadding(10,10,10,10);
+//                    iv.setPadding(10,10,10,10);
+                    iv.setPadding(1,1,1,1);
+
 
                     if (LanguageItems[position].setText) {
                         //need to set text in blank language circle

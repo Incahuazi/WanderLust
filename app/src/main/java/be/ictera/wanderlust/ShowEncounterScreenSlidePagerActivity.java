@@ -1,5 +1,6 @@
 package be.ictera.wanderlust;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -13,10 +14,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +31,7 @@ import Database.WanderLustDb;
 import Database.WanderLustDbHelper;
 import Entity.Encounter;
 import Entity.EncounterPicture;
+import Helper.GlideApp;
 import ShowEncounters.ScreenSlidePageFragment;
 
 public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity implements ScreenSlidePageFragment.OnFragmentInteractionListener {
@@ -54,7 +62,7 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
 
         // Instantiate a ViewPager and a PagerAdapter.
         mPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager());
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), this);
         mPager.setAdapter(mPagerAdapter);
     }
 
@@ -147,9 +155,11 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
         private int currentItem = -1;
+        private Context context = null;
 
-        public ScreenSlidePagerAdapter(FragmentManager fm) {
+        public ScreenSlidePagerAdapter(FragmentManager fm, Context c) {
             super(fm);
+            context = c;
         }
 
         @Override
@@ -168,6 +178,8 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                     "":((Encounter)EncountersMap.get(position)).encounterPicture[1].imageFilePath);;
             argsBundle.putString("Image3", ((Encounter)EncountersMap.get(position)).encounterPicture[2]==null?
                     "":((Encounter)EncountersMap.get(position)).encounterPicture[2].imageFilePath);;
+            argsBundle.putString("Image4", ((Encounter)EncountersMap.get(position)).encounterPicture[3]==null?
+                    "":((Encounter)EncountersMap.get(position)).encounterPicture[3].imageFilePath);;
 
             screenSlidePageFragment.setArguments(argsBundle);
             return screenSlidePageFragment;
@@ -182,6 +194,22 @@ public class ShowEncounterScreenSlidePagerActivity extends FragmentActivity impl
                     currentItem = currentItemTemp;
                     TextView textView = (TextView) findViewById(R.id.TextViewProfileName);
                     textView.setText(((Encounter)EncountersMap.get(currentItem)).Name);
+
+                    ImageView imageViewBackDrop = (ImageView) findViewById(R.id.main_backdrop);
+                    if (((Encounter) EncountersMap.get(currentItem)).encounterPicture[0] != null && !TextUtils.isEmpty(((Encounter) EncountersMap.get(currentItem)).encounterPicture[0].imageFilePath)) {
+                        File picture = new File(((Encounter) EncountersMap.get(currentItem)).encounterPicture[0].imageFilePath);
+                        GlideApp.with(context)
+                                .load(picture)
+                                .apply(RequestOptions.circleCropTransform())
+                                //.centerCrop()
+//                                .fitCenter()
+                                .into(imageViewBackDrop);
+                    } else {
+                        GlideApp.with(context)
+                        .load(R.drawable.cat)
+                        .apply(RequestOptions.circleCropTransform())
+                        .into(imageViewBackDrop);
+                    }
                 }
             }
         }

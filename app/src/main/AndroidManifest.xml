@@ -16,7 +16,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/myworld"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -59,7 +59,7 @@
         <activity android:name=".ThanksActivity" />
         <activity android:name=".IdeaActivity"></activity>
 
-        <receiver android:name=".NetworkStateChecker">
+        <receiver android:name="Sync.NetworkStateChecker">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

@@ -21,11 +21,13 @@
                 android:id="@+id/HomeScreenTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/amatic_sc"
                 android:paddingBottom="25dp"
                 android:paddingTop="25dp"
                 android:text="WANDERLUST"
                 android:textAlignment="center"
-                android:textSize="30sp" />
+                android:textSize="40sp"
+                android:textStyle="bold" />
 
             <ImageView
                 android:id="@+id/imageView3"
@@ -40,11 +42,12 @@
                 android:id="@+id/HSSubTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/amatic_sc"
                 android:paddingBottom="@dimen/text_margin"
                 android:paddingTop="25dp"
                 android:text="The travelling camera"
                 android:textAlignment="center"
-                android:textSize="24sp" />
+                android:textSize="34sp" />
 
     <TableLayout
         android:id="@+id/tableLayout"

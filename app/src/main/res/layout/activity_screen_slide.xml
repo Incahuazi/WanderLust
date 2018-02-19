@@ -28,8 +28,8 @@
                 android:id="@+id/main.backdrop"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/nederlands"
+                android:paddingTop="8dp"
+                android:src="@drawable/myworld"
                 app:layout_collapseMode="parallax"
                 />
 

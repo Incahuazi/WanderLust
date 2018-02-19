@@ -33,7 +33,9 @@ public class LanguageSelectActivity extends ListActivity {
         registerReceiver(new NetworkStateChecker(), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         dbHelper = new WanderLustDbHelper(this);
-        db = dbHelper.getReadableDatabase();
+//        db = dbHelper.getReadableDatabase();
+        db = dbHelper.getWritableDatabase();
+
 
         ArrayList<String[]> languages = dbHelper.GetAllLanguages(db);
 

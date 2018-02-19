@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
 
     private String LanguageCode = "ENG";
     private String strNoSyncNeeded = "No synchronization needed";
+    private String strSyncNeeded = "Please connect to a network. \n\nOnce connected, synchronization should start automatically.";
     private String strSynced = "Synced";
     private String strProgress = "progress";
 
@@ -55,6 +57,9 @@ public class SyncoverviewActivity extends AppCompatActivity {
         donutEncounterProgress = (MyDonutProgress) findViewById(R.id.donut_progress_encounters);
         donutPictureProgress = (MyDonutProgress) findViewById(R.id.donut_progress_pictures);
         textViewheader = (TextView) findViewById(R.id.textViewHeader);
+
+        textViewheader.setText(strSyncNeeded);
+        textViewheader.setGravity(Gravity.CENTER);
 
         HandleEncounterProgress();
         HandlePicturesProgress();
@@ -220,6 +225,10 @@ public class SyncoverviewActivity extends AppCompatActivity {
                 strNoSyncNeeded = resLang.get("SONoSyncNeeded");
             }
 
+            if (resLang.containsKey("SOSyncNeeded")){
+                strSyncNeeded = resLang.get("SOSyncNeeded");
+            }
+
             if (resLang.containsKey("SOSynced")) {
                 strSynced = resLang.get("SOSynced");
             }
@@ -234,7 +243,5 @@ public class SyncoverviewActivity extends AppCompatActivity {
         } finally{
             if (db!=null)db.close();
         }
-
     }
-
 }
