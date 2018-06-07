@@ -185,7 +185,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
             return (int)DatabaseUtils.longForQuery(db, unSyncedPicturesQuery, null);
         }
         catch(Exception e){
-            Log.d(TAG, "SyncService: could not get unsyced count from database" + e.getMessage());
+            Log.d(TAG, "syncservice: could not get unsyced count from database" + e.getMessage());
         }
         finally {
             if (db!=null)db.close();
@@ -207,7 +207,7 @@ public class SyncoverviewActivity extends AppCompatActivity {
             return (int)DatabaseUtils.longForQuery(db, unSyncedEncountersQuery, null);
         }
         catch(Exception e){
-            Log.d(TAG, "SyncService: could not get unsyced count from database" + e.getMessage());
+            Log.d(TAG, "syncservice: could not get unsyced count from database" + e.getMessage());
         }
         finally {
             if (db!=null)db.close();

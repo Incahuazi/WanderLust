@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
@@ -16,7 +17,6 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -34,7 +34,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -54,7 +53,7 @@ import Entity.Encounter;
 import Entity.EncounterPicture;
 import Helper.GlideApp;
 import Helper.helper;
-import Sync.NetworkStateChecker;
+import sync.NetworkStateChecker;
 
 import static Helper.helper.GetUTCdatetimeAsString;
 
@@ -84,6 +83,13 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     private String ErrorValidationEmail = "Please enter a valid email address";
     private String ErrorTakeProfilePicture = "PLease take a profile picture";
 
+    private EditText textInputName;
+    private EditText textInputMessage;
+    private EditText textInputLocationCity;
+    private EditText textInputLocationCountry;
+    private EditText textInputEmail;
+
+    private boolean activityIsClosing = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,6 +117,11 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         this.pics[2] = (ImageView)findViewById(R.id.Pic3);
         this.pics[3] = (ImageView)findViewById(R.id.Pic4);
 
+        textInputName = (EditText)findViewById(R.id.TextInputName);
+        textInputMessage = (EditText)findViewById(R.id.ADDETextInputMessage);
+        textInputLocationCity = (EditText)findViewById(R.id.TextInputLocationCity);
+        textInputLocationCountry = (EditText)findViewById(R.id.TextInputLocationCountry);
+        textInputEmail = (EditText)findViewById(R.id.TextInputEmail);
 
         for (int i = 0; i <4 ; i++) {
             final int item = i;
@@ -121,10 +132,14 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
                 }
             });
         }
-        if (savedInstanceState!=null && savedInstanceState.containsKey(BUNDLE_DATA_ENCOUNTER))
-        {
+
+        //Check if there is an ongoing encounter being added
+        SharedPreferences foo = getPreferences(MODE_PRIVATE);
+        String savedEncounterString = foo.getString(BUNDLE_DATA_ENCOUNTER, "");
+        if (savedEncounterString != null && !savedEncounterString.isEmpty()){
+            //restore previous encounter
             Gson gson = new Gson();
-            encounter = gson.fromJson(savedInstanceState.getString(BUNDLE_DATA_ENCOUNTER), Encounter.class);
+            encounter = gson.fromJson(savedEncounterString, Encounter.class);
             for (int i=0;i<encounter.encounterPicture.length;i++){
                 if (encounter.encounterPicture[i] !=null){
                     String imageFilePath = encounter.encounterPicture[i].imageFilePath;
@@ -133,13 +148,18 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
                     }
                 }
             }
+            textInputName.setText(encounter.Name);
+            textInputMessage.setText(encounter.Message);
+            textInputLocationCity.setText(encounter.LocationCity);
+            textInputLocationCountry.setText(encounter.LocationCountry);
+            textInputEmail.setText(encounter.EmailAddress);
         }
-        else{
+        else {
             encounter = new Encounter();
         }
-
-        if (savedInstanceState !=null && savedInstanceState.containsKey(BUNDLE_DATA_CURRENTPIC)){
-            currentPicture = savedInstanceState.getInt(BUNDLE_DATA_CURRENTPIC);
+        int savedCurrentPicture = foo.getInt(BUNDLE_DATA_CURRENTPIC,  -1);
+        if (savedCurrentPicture!=-1){
+            currentPicture = savedCurrentPicture;
         }
 
         //start a client for location requests
@@ -216,12 +236,6 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         SQLiteDatabase db = dbhelper.getWritableDatabase();
         ContentValues encounterValues = new ContentValues();
 
-        EditText textInputName = (EditText)findViewById(R.id.TextInputName);
-        EditText textInputMessage = (EditText)findViewById(R.id.ADDETextInputMessage);
-        EditText textInputLocationCity = (EditText)findViewById(R.id.TextInputLocationCity);
-        EditText textInputLocationCountry = (EditText)findViewById(R.id.TextInputLocationCountry);
-        EditText textInputEmail = (EditText)findViewById(R.id.TextInputEmail);
-
         String strTextInputName = textInputName.getText().toString();
         String strTextInputMessage = textInputMessage.getText().toString();
         String strTextInputLocationCity = textInputLocationCity.getText().toString();
@@ -255,13 +269,12 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         //check if there is at least a profile picture
         //this is picture with id 0
 
-        if (this.encounter.encounterPicture[0] == null || !TextUtils.isEmpty(this.encounter.encounterPicture[0].imageFilePath)){
+        if (this.encounter.encounterPicture[0] == null || TextUtils.isEmpty(this.encounter.encounterPicture[0].imageFilePath)){
             Toast myToast = Toast.makeText(this, ErrorTakeProfilePicture, Toast.LENGTH_LONG);
             myToast.setGravity(Gravity.CENTER,0,0);
             myToast.show();
             return;
         }
-
 
         db.beginTransaction();
         try {
@@ -288,6 +301,14 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
         finally{
             db.endTransaction();
         }
+
+        //clear the current SharedPreferences
+        SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear();
+        editor.commit();
+        activityIsClosing = true;
+
         networkStateChecker.tryToSync(this);
         Intent i = new Intent(getApplicationContext(), ThanksActivity.class);
         i.putExtra("LanguageCode", LanguageCode);
@@ -307,21 +328,6 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
             currentPicture = item;
             startActivityForResult(intent, SHOW_PICTURE_REQUEST);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState){
-        super.onSaveInstanceState(outState);
-
-        //save encounter to bundle
-        Gson gson = new Gson();
-        String encounterJson = gson.toJson(encounter);
-        outState.putString(BUNDLE_DATA_ENCOUNTER, encounterJson);
-
-        //save currentPicture
-        outState.putInt(BUNDLE_DATA_CURRENTPIC, currentPicture);
-
-        //TODO: Location
     }
 
     private void dispatchTakePictureIntent(int item) {
@@ -385,31 +391,35 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     }
 
     private void setPic(ImageView mImageView, String imageFilePath, boolean circular) {
-        File picture = new File(imageFilePath);
+        try {
+            File picture = new File(imageFilePath);
 //        Glide.with(this).load(picture).into(mImageView);
 
-        if (circular){
-            GlideApp.with(this)
-                    .load(picture)
-                    .fitCenter()
-                    .apply(RequestOptions.circleCropTransform())
-                    //.centerCrop()
-                    .into(mImageView);
-        } else {
-            GlideApp.with(this)
-                    .load(picture)
-                    //.centerCrop()
-                    //.fitCenter()
-                    .into(mImageView);
-        }
+            if (circular){
+                GlideApp.with(this)
+                        .load(picture)
+                        .fitCenter()
+                        .apply(RequestOptions.circleCropTransform())
+                        //.centerCrop()
+                        .into(mImageView);
+            } else {
+                GlideApp.with(this)
+                        .load(picture)
+                        //.centerCrop()
+                        //.fitCenter()
+                        .into(mImageView);
+            }
 
-        ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(imageFilePath);
-        } catch (IOException e) {
+            ExifInterface exif = null;
+            try {
+                exif = new ExifInterface(imageFilePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
 
 //        mImageView.setRotation(90);
     }
@@ -447,6 +457,34 @@ public class AddEncounterActivity extends AppCompatActivity implements GoogleApi
     @Override
     protected void onPause() {
         super.onPause();
+
+        if (!activityIsClosing) {
+
+            //add the current textinput to the encount
+            String strTextInputName = textInputName.getText().toString();
+            String strTextInputMessage = textInputMessage.getText().toString();
+            String strTextInputLocationCity = textInputLocationCity.getText().toString();
+            String strTextInputLocationCountry = textInputLocationCountry.getText().toString();
+            String strTextInputEmail = textInputEmail.getText().toString();
+
+            encounter.EmailAddress = strTextInputEmail;
+            encounter.LocationCity = strTextInputLocationCity;
+            encounter.LocationCountry = strTextInputLocationCountry;
+            encounter.Message = strTextInputMessage;
+            encounter.Name = strTextInputName;
+
+            //save encounter to shared preferences
+            SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            Gson gson = new Gson();
+            String encounterJson = gson.toJson(encounter);
+            editor.putString(BUNDLE_DATA_ENCOUNTER, encounterJson);
+
+            //save currentPicture
+            editor.putInt(BUNDLE_DATA_CURRENTPIC, currentPicture);
+            editor.apply();
+        }
+
         if (mGoogleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();

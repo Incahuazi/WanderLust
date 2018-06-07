@@ -1,4 +1,4 @@
-package Sync;
+package sync;
 
 /**
  * Created by Erik.Rans on 13/11/2017.

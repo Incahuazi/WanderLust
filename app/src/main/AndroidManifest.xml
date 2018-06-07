@@ -51,7 +51,7 @@
         <activity android:name=".HomeScreenActivity" />
 
         <service
-            android:name="Sync.SyncService"
+            android:name="sync.syncservice"
             android:exported="false" />
 
         <activity android:name=".DisplayPictureActivity_readonly" />
@@ -59,7 +59,7 @@
         <activity android:name=".ThanksActivity" />
         <activity android:name=".IdeaActivity"></activity>
 
-        <receiver android:name="Sync.NetworkStateChecker">
+        <receiver android:name="sync.NetworkStateChecker">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>

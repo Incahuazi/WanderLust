@@ -1,4 +1,4 @@
-package Sync;
+package sync;
 
 import android.app.IntentService;
 import android.content.ContentValues;
@@ -20,21 +20,19 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.List;
 
 import Database.WanderLustDb;
 import Database.WanderLustDbHelper;
 import Entity.Encounter;
-import SelectLanguage.LanguageItem;
 
 import static android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE;
-import static java.util.regex.Pattern.quote;
 
 
 /**
@@ -43,9 +41,9 @@ import static java.util.regex.Pattern.quote;
  * <p>
  * TODO: Customize class - update intent actions and extra parameters.
  */
-public class SyncService extends IntentService {
+public class syncservice extends IntentService {
 
-    private static final String TAG = "SyncService";
+    private static final String TAG = "syncservice";
     private WanderLustDbHelper dbHelper = null;
     private SQLiteDatabase db = null;
 
@@ -57,7 +55,7 @@ public class SyncService extends IntentService {
         (Env.equals("P"))? "http://gowanderlust.azurewebsites.net/Wanderlust.WebAPI/api": "wrong env param";
 
 
-    public SyncService() {super("SyncService");}
+    public syncservice() {super("syncservice");}
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -66,7 +64,7 @@ public class SyncService extends IntentService {
             db = dbHelper.getWritableDatabase();
         }
         catch(Exception e){
-            Log.d(TAG, "SyncService: could not open database" + e.getMessage());
+            Log.d(TAG, "syncservice: could not open database" + e.getMessage());
         }
         try {
             Log.d(TAG, "onHandleIntent: starting service");
@@ -369,11 +367,27 @@ public class SyncService extends IntentService {
             urlConnection.setRequestProperty("Content-Type","image/jpeg");
 
             //attach the file
-            File file = new File(encounterPictureImagePath);
-            byte[] fileData = new byte[(int) file.length()];
-            DataInputStream dis = new DataInputStream(new FileInputStream(file));
-            dis.readFully(fileData);
-            dis.close();
+            byte[] fileData = new byte[0];
+            boolean fileRead = false;
+            //try to read the file a few times, if it still fails mark as synced
+            for (int i=0; i<5; i++) {
+                try {
+                    File file = new File(encounterPictureImagePath);
+                    fileData = new byte[(int) file.length()];
+                    DataInputStream dis = new DataInputStream(new FileInputStream(file));
+                    dis.readFully(fileData);
+                    dis.close();
+                    fileRead = true;
+                    break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!fileRead){
+                //mark as synced anyway, don't keep retrying
+                setEncounterPictureSynced(encounterPictureId);
+                return true;
+            }
 
             printout = new DataOutputStream(urlConnection.getOutputStream ());
             printout.write(fileData);

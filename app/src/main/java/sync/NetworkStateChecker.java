@@ -1,10 +1,9 @@
-package Sync;
+package sync;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
@@ -28,7 +27,7 @@ public class NetworkStateChecker extends BroadcastReceiver {
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI || activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE){
                 Log.d(TAG, "onReceive: network detected");
 
-                Intent newIntent = new Intent(context, SyncService.class);
+                Intent newIntent = new Intent(context, syncservice.class);
                 context.startService(newIntent);
             }
         }

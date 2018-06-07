@@ -1,4 +1,4 @@
-package Sync;
+package sync;
 
 import java.util.List;
 

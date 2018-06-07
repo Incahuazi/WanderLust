@@ -12,12 +12,11 @@ import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 import Database.WanderLustDbHelper;
 import SelectLanguage.LanguageItem;
 import SelectLanguage.LanguageListAdapter;
-import Sync.NetworkStateChecker;
+import sync.NetworkStateChecker;
 
 public class LanguageSelectActivity extends ListActivity {
 
